@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 export default function ProductRevealDemoPage() {
   return (
     <main>
-      <section className="flex min-h-screen items-center justify-center">
+      <section className="flex min-h-screen flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-semibold">ProductReveal</h1>
         <p className="text-lg">Scroll para ver el producto rotar ↓</p>
       </section>
       <ProductReveal

@@ -14,10 +14,11 @@ export interface ProductRevealProps {
   mode?: ProductRevealMode;
   rotationRange?: [number, number];
   pinDuration?: string | number;
+  mobileBreakpoint?: number;
   className?: string;
 }
 
-const MOBILE_BREAKPOINT = 768;
+const DEFAULT_MOBILE_BREAKPOINT = 768;
 const DEFAULT_ROTATION_RANGE: [number, number] = [-15, 15];
 const DEFAULT_PIN_DURATION = "+=1000";
 
@@ -26,7 +27,7 @@ const DEFAULT_PIN_DURATION = "+=1000";
  * ProductReveal's public signature doesn't change when it is added later —
  * until then it falls back to "css3d" instead of throwing.
  */
-export function resolveProductRevealMode(mode: ProductRevealMode): "css3d" {
+function resolveProductRevealMode(mode: ProductRevealMode): "css3d" {
   if (mode === "sequence") {
     console.warn(
       '[ProductReveal] mode="sequence" is not implemented yet — falling back to "css3d".'
@@ -42,6 +43,7 @@ export function ProductReveal({
   mode = "css3d",
   rotationRange = DEFAULT_ROTATION_RANGE,
   pinDuration = DEFAULT_PIN_DURATION,
+  mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
   className,
 }: ProductRevealProps) {
   resolveProductRevealMode(mode);
@@ -59,7 +61,7 @@ export function ProductReveal({
     ).matches;
     if (prefersReducedMotion) return;
 
-    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+    const isMobile = window.innerWidth < mobileBreakpoint;
     const [fromDeg, toDeg] = isMobile
       ? [rotationRange[0] / 2, rotationRange[1] / 2]
       : rotationRange;
@@ -70,6 +72,7 @@ export function ProductReveal({
       {
         rotateY: toDeg,
         ease: "none",
+        transformPerspective: 1200,
         scrollTrigger: {
           trigger: section,
           start: "top top",
@@ -84,7 +87,7 @@ export function ProductReveal({
       tween.scrollTrigger?.kill();
       tween.kill();
     };
-  }, [rotationRange, pinDuration]);
+  }, [rotationRange, pinDuration, mobileBreakpoint]);
 
   return (
     <section
@@ -99,7 +102,7 @@ export function ProductReveal({
         src={src}
         alt={alt}
         className="h-auto w-full max-w-sm"
-        style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+        style={{ willChange: "transform" }}
       />
     </section>
   );

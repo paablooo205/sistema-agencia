@@ -43,8 +43,9 @@ comportamiento desktop reducido es suficiente.
 
 `image-zoom`, `image-pan`, `image-reveal`, `parallax`, `pinned-scene`,
 `horizontal-scroll`, `text-split`, `text-mask`, `clip-path-reveal`,
-`video-scrub`, `image-sequence`, `product-rotation`, `3d-camera`,
-`3d-object`, `particles`, `page-transition`.
+`video-scrub`, `image-sequence`, `3d-camera`, `3d-object`, `particles`,
+`page-transition`.
 
-Esta carpeta está vacía de recetas documentadas por ahora — se irán
-añadiendo a medida que Motion Agent las use y valide en proyectos reales.
+`product-rotation` está documentada; el resto de recetas previstas se
+irán añadiendo a medida que Motion Agent las use y valide en proyectos
+reales.

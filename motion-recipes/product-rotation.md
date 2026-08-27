@@ -41,6 +41,9 @@ Implementado por `ProductReveal`
   completo y necesitan `mode: "sequence"` para no verse plano/falso.
 - `pinDuration?: string | number` — largo del tramo pineado en unidades de
   `ScrollTrigger` `end`, default `"+=1000"` (1000px de scroll).
+- `mobileBreakpoint?: number` — ancho en px por debajo del cual se aplica
+  el comportamiento móvil (sin `pin`, `rotationRange` a la mitad), default
+  `768`.
 
 ## Rendimiento
 Coste bajo: una sola imagen, una propiedad animada (`transform`), sin
