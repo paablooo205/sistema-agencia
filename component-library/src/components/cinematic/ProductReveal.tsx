@@ -73,7 +73,7 @@ export function ProductReveal({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: pinDuration,
+          end: typeof pinDuration === "number" ? `+=${pinDuration}` : pinDuration,
           scrub: true,
           pin: !isMobile,
         },
