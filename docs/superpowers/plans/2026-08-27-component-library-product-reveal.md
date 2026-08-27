@@ -81,9 +81,11 @@ mv README.md ../README.md.component-library.bak
 - [ ] **Step 2: Run create-next-app non-interactively**
 
 Run (from inside `component-library/`, target `.` so it scaffolds in
-place):
+place). Pin the major version to 15 explicitly — `@latest` will resolve to
+whatever is newest at the time (already caught once resolving to Next.js
+16, which contradicts this plan's Global Constraints):
 ```bash
-npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack
+npx --yes create-next-app@15 . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack
 ```
 
 Expected: command completes without prompting (all decision flags were
