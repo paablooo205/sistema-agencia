@@ -1,7 +1,8 @@
 # Component Library — primera pasada (diseño)
 
 Fecha: 2026-08-27
-Estado: aprobado por el usuario en chat, pendiente de revisión del spec.
+Estado: aprobado por el usuario en chat, incluyendo cambio de alcance a
+ProductReveal como único componente de esta pasada.
 
 ## Contexto
 
@@ -14,14 +15,15 @@ balonmano, `handball-club-pwa`), no la plantilla cinematográfica que
 `frontend-agent` asume.
 
 Este spec cubre la primera pasada real: convertir `component-library/` en
-una app Next.js funcional con 3 componentes, y documentar sus recetas de
-animación correspondientes en `motion-recipes/`.
+una app Next.js funcional con `ProductReveal`, y documentar su receta de
+animación correspondiente en `motion-recipes/`.
 
 ## Objetivo
 
 Tener una base de componentes cinematográficos real, ejecutable y
 verificada visualmente — no solo documentada — que sirva de:
-1. Showcase/demo de cada componente (una página por componente).
+1. Showcase/demo de `ProductReveal`, con una página por componente a
+   medida que se añadan más.
 2. Punto de partida que `frontend-agent` pueda copiar/clonar como arranque
    de un proyecto de cliente nuevo, hasta que exista una plantilla base
    separada (decisión explícita: no se construye una plantilla aparte en
@@ -29,17 +31,26 @@ verificada visualmente — no solo documentada — que sirva de:
 
 ## Alcance de esta pasada
 
-3 componentes, elegidos por cubrir los patrones más comunes sin
-sobre-invertir antes de validar el setup contra un cliente real:
+**Cambio de alcance decidido por el usuario tras la primera revisión**: en
+vez de los 3 componentes originalmente propuestos (más sencillos), la
+primera pasada real es un único componente — `ProductReveal` — por ser el
+efecto que motivó el proyecto (objeto que rota al hacer scroll) y para
+validar el pipeline completo con el componente que más importa, no con el
+más simple.
 
-- `CinematicScene` — contenedor estructural de escena (no anima).
-- `ParallaxImage` — imagen con profundidad relativa al scroll.
-- `TextReveal` — revelado progresivo de texto al entrar en viewport.
+- `ProductReveal` — aparición y rotación progresiva de un producto/objeto
+  protagonista, pineado durante un tramo de scroll.
+
+Sin dependencia técnica bloqueante de los otros componentes: no necesita
+`CinematicScene` como wrapper ni `ImageSequence`/pipeline de vídeo — ver
+"Especificación de componentes" para el porqué (elección de `mode:
+"css3d"` frente a `"sequence"`).
 
 Fuera de alcance en esta pasada (quedan en el README como pendientes):
-`PinnedScene`, `HorizontalGallery`, `ScrollImage`, `ScrollText`,
-`TextMask`, `VideoScrub`, `ImageSequence`, `ProductReveal`,
-`ClipPathReveal`, `PageTransition`, `ThreeScene`, `ParticleScene`.
+`CinematicScene`, `ParallaxImage`, `TextReveal`, `PinnedScene`,
+`HorizontalGallery`, `ScrollImage`, `ScrollText`, `TextMask`, `VideoScrub`,
+`ImageSequence`, `ClipPathReveal`, `PageTransition`, `ThreeScene`,
+`ParticleScene`.
 
 ## Stack y setup
 
@@ -51,24 +62,26 @@ Fuera de alcance en esta pasada (quedan en el README como pendientes):
 - `lenis` (paquete npm actual; sucesor de `@studio-freight/lenis`).
 - **No** se instala shadcn/ui en esta pasada: el `CLAUDE.md` del sistema
   lo reserva para "componentes UI no cinematográficos" (botones, forms) y
-  ninguno de los 3 componentes de esta pasada lo necesita. Se añade
-  cuando haga falta.
+  `ProductReveal` no lo necesita. Se añade cuando haga falta.
 - Gestor de paquetes: npm (consistente con `plantilla_base/`).
+- **`.gitignore` se crea como primer paso del scaffold**, antes del primer
+  `npm install` — el repo `_sistema/` no tiene ningún `.gitignore` todavía
+  en ningún nivel (confirmado antes de esta pasada). Debe excluir como
+  mínimo `node_modules/`, `.next/`, `.env*`, y los artefactos habituales
+  de build de Next.js. Verificar su contenido antes del primer commit del
+  scaffold, no después.
 
 ## Estructura de directorios
 
 ```
 component-library/
+├── .gitignore                           ← creado antes del primer npm install
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx                    ← índice con enlaces a cada demo
-│   │   ├── cinematic-scene/page.tsx
-│   │   ├── parallax-image/page.tsx
-│   │   └── text-reveal/page.tsx
+│   │   ├── page.tsx                    ← índice con enlace a la demo
+│   │   └── product-reveal/page.tsx
 │   ├── components/cinematic/
-│   │   ├── CinematicScene.tsx
-│   │   ├── ParallaxImage.tsx
-│   │   └── TextReveal.tsx
+│   │   └── ProductReveal.tsx
 │   └── lib/
 │       └── lenis-provider.tsx          ← sincroniza Lenis con ScrollTrigger.update
 ├── package.json, tsconfig.json, tailwind config, postcss config
@@ -77,55 +90,64 @@ component-library/
 
 ## Especificación de componentes
 
-### `CinematicScene`
-- Contenedor estructural de una escena dentro del scroll.
-- Props: `children`, `className?`, `minHeight?` (default `100vh`),
-  `background?` (color o clase).
-- No anima nada por sí mismo — lo usan `ParallaxImage`/`TextReveal` por
-  dentro o alrededor.
-
-### `ParallaxImage`
-- Imagen con desplazamiento relativo al scroll, implementado con
-  `transform` (GPU-friendly, no `top`/`margin`).
-- Props: `src`, `alt` (obligatorio, sin default vacío), `speed?` (default
-  `0.3`, rango recomendado documentado en el recipe), `className?`.
+### `ProductReveal`
+- Aparición y rotación progresiva de un producto/objeto protagonista,
+  pineado (`ScrollTrigger` `pin: true`, plugin core gratuito) durante un
+  tramo de scroll.
+- Implementación de esta pasada: `transform: rotateY()/rotateX()` sobre el
+  objeto, con scrub ligado al progreso del pin (GPU-friendly, sin
+  `top`/`margin`).
+- Props:
+  - `src` (obligatorio)
+  - `alt` (obligatorio, sin default vacío)
+  - `mode?: "css3d" | "sequence"` (default `"css3d"`) — **firma
+    definitiva desde esta pasada**, pensada para no romperse cuando se
+    implemente el modo `"sequence"` (frame-scrubbing) más adelante. Si se
+    pasa `"sequence"` antes de que exista esa implementación, el
+    componente hace fallback a `"css3d"` y emite un `console.warn` claro
+    indicando que `"sequence"` todavía no está implementado — nunca falla
+    en silencio ni lanza una excepción que rompa el render.
+  - `rotationRange?` (grados, tupla `[min, max]`, default documentado en
+    el recipe) — solo aplica a `mode: "css3d"`.
+  - `pinDuration?` (largo del tramo de scroll pineado, default
+    documentado en el recipe).
+  - `className?`.
+- `mode: "sequence"` (frame-scrubbing con `<canvas>`, pipeline ffmpeg) NO
+  se implementa en esta pasada — ver "Fuera de alcance". Solo existe como
+  valor válido del tipo y como rama de fallback, para que la interfaz
+  pública del componente no cambie cuando se añada.
 - Estrategia móvil: por debajo de un breakpoint configurable (default
-  768px) reduce el desplazamiento o lo desactiva, documentado en el
-  recipe `parallax.md`.
-- Respeta `prefers-reduced-motion`: si está activo, no aplica
-  desplazamiento.
-
-### `TextReveal`
-- Revela el texto progresivamente cuando entra en el viewport.
-- Props: `children` (string o nodo simple), `className?`, `stagger?`
-  (default razonable documentado en el recipe).
-- Implementación: divide el texto en `span`s manualmente (sin depender
-  del plugin `SplitText` de GSAP, que requiere licencia Club GreenSock) —
-  decisión explícita para no introducir una dependencia de pago.
-- Respeta `prefers-reduced-motion`: si está activo, el texto aparece
-  directamente sin animación.
+  768px, consistente con el resto de la librería) reduce o desactiva el
+  pin/rotación — documentado en el recipe `product-rotation.md`.
+- Respeta `prefers-reduced-motion`: si está activo, el objeto se muestra
+  estático (sin pin ni rotación).
 
 ## Motion recipes
 
-Se documentan 2 recetas en `motion-recipes/`, siguiendo el formato ya
+Se documenta 1 receta en `motion-recipes/`, siguiendo el formato ya
 definido en `motion-recipes/README.md` (Propósito / Cuándo usarla / Cuándo
 NO usarla / Implementación / Parámetros / Rendimiento / Comportamiento
 móvil):
 
-- `parallax.md` — corresponde a `ParallaxImage`.
-- `text-reveal.md` — corresponde a `TextReveal`.
+- `product-rotation.md` — corresponde a `ProductReveal`, `mode: "css3d"`.
+  Cuando se implemente `mode: "sequence"` en una pasada futura, se
+  documenta como sección adicional de esta misma receta (no una receta
+  nueva, es la misma técnica de producto con otra implementación).
 
-`CinematicScene` no genera receta: es un contenedor estructural, no una
-técnica de animación.
+`parallax.md` y `text-reveal.md` se escriben cuando se construyan
+`ParallaxImage` y `TextReveal`, no en esta pasada.
 
 ## Verificación
 
+Antes del primer commit del scaffold: confirmar que `.gitignore` existe y
+excluye `node_modules/`, `.next/` y `.env*`.
+
 Antes de dar la pasada por terminada: `npm run dev` y comprobar en el
-navegador cada una de las 3 demo pages (`/cinematic-scene`,
-`/parallax-image`, `/text-reveal`) — confirmar que la animación se ve, que
-no hay errores de consola, y una pasada rápida de responsive (mobile
-width) para confirmar que las estrategias móviles documentadas se
-respetan visualmente.
+navegador la demo page `/product-reveal` — confirmar que la rotación se ve
+con `mode: "css3d"`, que pasar `mode: "sequence"` cae a `"css3d"` con el
+warning esperado en consola (sin excepción ni pantalla rota), que no hay
+errores de consola, y una pasada rápida de responsive (mobile width) para
+confirmar que la estrategia móvil documentada se respeta visualmente.
 
 No se añaden tests automatizados en esta pasada (YAGNI): no hay lógica
 compleja más allá de props → comportamiento visual, y la verificación
@@ -146,7 +168,12 @@ manual en navegador ya cubre lo que un test unitario aportaría aquí.
 
 ## Fuera de alcance (explícito)
 
-- Los otros 12 componentes listados en `component-library/README.md`.
+- Los otros 14 componentes listados en `component-library/README.md`
+  (incluye `CinematicScene`, `ParallaxImage` y `TextReveal`, pospuestos
+  desde el alcance original de esta pasada).
+- `mode: "sequence"` de `ProductReveal` (frame-scrubbing con `<canvas>` +
+  pipeline ffmpeg) — el prop y el fallback existen ya, la implementación
+  real no.
 - Las 14 recetas restantes listadas en `motion-recipes/README.md`.
 - Cualquier trabajo sobre `reference-library/` (no toca en esta pasada).
 - Una plantilla base Next.js separada para clientes reales — se decide

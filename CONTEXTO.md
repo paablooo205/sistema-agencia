@@ -122,16 +122,27 @@ porque el proceso padre ya tenía el entorno cacheado desde antes del
   separado de una plantilla aparte), decidido explícitamente por el
   usuario para no duplicar esfuerzo montando dos proyectos Next.js sin
   tener aún un cliente real que lo justifique. Ver spec para el detalle.
-- **Alcance de la primera pasada de componentes: solo 3** —
-  `CinematicScene`, `ParallaxImage`, `TextReveal` — de los 15 previstos en
-  el README, elegidos por cubrir los patrones más comunes sin
-  sobre-invertir antes de validar el setup contra un cliente real.
+- **Alcance de la primera pasada de componentes: solo 1, `ProductReveal`**
+  (cambiado en la sesión del 2026-08-27 respecto al plan original de 3 —
+  `CinematicScene`, `ParallaxImage`, `TextReveal` — que quedan pospuestos).
+  Motivo del cambio: `ProductReveal` es el efecto que motivó el proyecto
+  (objeto que rota al hacer scroll) y el usuario quiso validar el pipeline
+  completo con el componente que más le importa, no con el más sencillo.
+  Sin dependencia técnica bloqueante de los otros componentes.
+- **`ProductReveal` tiene un prop `mode?: "css3d" | "sequence"`** (default
+  `"css3d"`) desde esta pasada, aunque `"sequence"` (frame-scrubbing con
+  `<canvas>` + pipeline ffmpeg) no se implementa todavía — solo existe el
+  tipo y un fallback a `"css3d"` con `console.warn` si se pasa
+  `"sequence"` antes de tiempo. Decisión explícita del usuario para que la
+  firma del componente no tenga que romperse cuando se añada el modo
+  secuencia más adelante.
 - **Sin shadcn/ui todavía** en `component-library/`: el `CLAUDE.md` lo
-  reserva para componentes UI no cinematográficos; ninguno de los 3
-  primeros lo necesita.
-- **`TextReveal` sin el plugin `SplitText` de GSAP** (que requiere licencia
-  Club GreenSock) — se divide el texto en spans a mano para no introducir
-  una dependencia de pago.
+  reserva para componentes UI no cinematográficos; `ProductReveal` no lo
+  necesita.
+- **Sin `.gitignore` en ningún nivel del repo `_sistema/` hasta esta
+  sesión** — se añade como primer paso del scaffold de
+  `component-library/`, antes del primer `npm install`, no como un ajuste
+  posterior.
 - **Sin tests automatizados en la primera pasada de componentes** (YAGNI)
   — verificación manual en navegador (`npm run dev` + mirar cada demo
   page) porque no hay lógica compleja más allá de props → comportamiento
@@ -140,12 +151,13 @@ porque el proceso padre ya tenía el entorno cacheado desde antes del
 ## A medias (lo importante)
 
 **`component-library/` sigue siendo solo un README.** El spec de diseño
-para la primera pasada (3 componentes + 2 motion-recipes) está **escrito,
-autorrevisado y aprobado por el usuario en chat**, en
+para la primera pasada (`ProductReveal` + 1 motion-recipe, tras el cambio
+de alcance del 2026-08-27) está **escrito, autorrevisado y aprobado por el
+usuario en chat**, en
 `docs/superpowers/specs/2026-08-27-component-library-design.md` — pero
 **no se ha escrito ni una línea de código todavía**. No existe
 `package.json`, no hay proyecto Next.js scaffolded, no hay componentes
-`.tsx`, no hay recetas en `motion-recipes/`.
+`.tsx`, no hay recetas en `motion-recipes/`, no hay `.gitignore`.
 
 `_test-cliente/` está vacía y limpia (el brief de prueba de la cafetería
 no dejó rastro) — lista para usarse de nuevo cuando haya un
@@ -160,19 +172,22 @@ Seguíamos el proceso arquitectónico completo de la skill de brainstorming
 2. ~~Spec escrito, autorrevisado y commiteado~~ ✔ hecho
    (`docs/superpowers/specs/2026-08-27-component-library-design.md`,
    commit `e0cd917`)
-3. **Pendiente**: el usuario revisa el spec escrito (se le pidió
-   explícitamente, no ha respondido todavía cuando se escribió este
-   CONTEXTO.md)
-4. **Siguiente acción de Claude**: en cuanto el usuario confirme el spec
-   (o pida cambios y se re-revise), invocar la skill
+3. ~~El usuario revisa el spec escrito~~ ✔ hecho, en una sesión nueva
+   (2026-08-27): pidió 2 cambios — confirmar que faltaba `.gitignore`
+   (confirmado, no existía ninguno en el repo) y cambiar el alcance de 3
+   componentes a solo `ProductReveal`, con un prop `mode?: "css3d" |
+   "sequence"` (default `"css3d"`, `"sequence"` sin implementar todavía
+   pero con firma definitiva). Spec y este archivo actualizados en disco
+   para reflejarlo.
+4. **Siguiente acción de Claude**: invocar la skill
    `superpowers:writing-plans` para generar el plan de implementación —
    **no** implementar directamente sin pasar por ese plan, es la regla
    dura de la skill de brainstorming para el camino arquitectónico.
-5. Tras el plan: implementar (scaffold Next.js en `component-library/`,
-   los 3 componentes, el `LenisProvider`, las 3 demo pages, actualizar
-   `component-library/README.md`, escribir `parallax.md` y
-   `text-reveal.md` en `motion-recipes/`), verificar con `npm run dev` en
-   el navegador, commitear.
+5. Tras el plan: implementar (scaffold Next.js en `component-library/`
+   empezando por `.gitignore`, `ProductReveal`, el `LenisProvider`, la
+   demo page `/product-reveal`, actualizar `component-library/README.md`,
+   escribir `product-rotation.md` en `motion-recipes/`), verificar con
+   `npm run dev` en el navegador, commitear.
 6. Después de eso: el usuario quiere ver un ejemplo real (un proyecto de
    cliente de prueba usando `/cinematic-web-engine:nuevo-proyecto` de
    verdad) — sus palabras fueron "cuando esté todo veremos un ejemplo".
