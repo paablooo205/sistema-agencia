@@ -46,5 +46,18 @@ originó.
 | `ThreeScene` | Contenedor de escena Three.js/R3F. |
 | `ParticleScene` | Sistema de partículas. |
 
-Esta carpeta está vacía de implementación por ahora — se irá poblando a
-medida que cada componente se construya y valide en un proyecto real.
+## Estado
+
+`ProductReveal` está implementado (`src/components/cinematic/
+ProductReveal.tsx`), con demo en `/product-reveal`. Resto de componentes
+de esta tabla: pendientes.
+
+## Desarrollo
+
+```bash
+npm install
+npm run dev
+```
+
+Abrir `http://localhost:3000` — el índice enlaza a la demo de cada
+componente implementado.
