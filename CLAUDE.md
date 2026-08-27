@@ -79,9 +79,15 @@ detalle completo de esta filosofía.
 ## Pipeline de proyecto
 
 El punto de entrada para un proyecto de cliente nuevo es el comando
-`/nuevo-proyecto` (ver `.claude/commands/nuevo-proyecto.md`). Ningún paso
-del pipeline avanza al siguiente sin que el paso anterior esté resuelto y
-haya dejado su output documentado.
+`/nuevo-proyecto`. Las 8 skills de agente y el comando viven en el plugin
+`cinematic-web-engine` (`~/.claude/skills/cinematic-web-engine/`), no en
+esta carpeta — están disponibles en cualquier proyecto abierto en este
+ordenador. Ningún paso del pipeline avanza al siguiente sin que el paso
+anterior esté resuelto y haya dejado su output documentado.
+
+Ese plugin depende de la variable de entorno `CINEMATIC_ENGINE_HOME`
+apuntando a esta carpeta (`_sistema/`), para poder leer este `CLAUDE.md`
+y las tres bibliotecas de abajo desde cualquier carpeta de cliente.
 
 ## Documentos de referencia
 
