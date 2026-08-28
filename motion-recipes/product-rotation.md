@@ -47,7 +47,14 @@ Implementado por `ProductReveal`
   muestre de frente — empieza ya girado hacia un extremo, contradiciendo
   el "aparición Y rotación progresiva" del objetivo de este componente.
 - `pinDuration?: string | number` — largo del tramo pineado en unidades de
-  `ScrollTrigger` `end`, default `"+=1000"` (1000px de scroll).
+  `ScrollTrigger` `end`, default `500` (500px de scroll; antes `1000`).
+  Con `ease: "none"`, el barrido de 30° se reparte linealmente sobre esa
+  distancia: a 1000px salían 0.03°/px, y una rueda de ratón (~100-120px
+  por click) o un gesto de scroll normal (~200-500px) solo cubrían entre
+  el 20% y el 50% del giro — además de ser el 40-55% de todo el scroll de
+  esta demo para un detalle pensado como sutil, no como pieza central. A
+  500px, un gesto normal-alto lo completa sin sentirse instantáneo ni
+  eterno.
 - `mobileBreakpoint?: number` — ancho en px por debajo del cual se aplica
   el comportamiento móvil (sin `pin`, `rotationRange` a la mitad), default
   `768`.
@@ -61,7 +68,21 @@ que el scroll "no avanza", reducir `pinDuration` antes que tocar nada más.
 ## Comportamiento móvil
 Por debajo de 768px de ancho, `ProductReveal` desactiva el `pin` (el
 scroll pineado en móvil suele sentirse como que la página se ha quedado
-"atascada", peor experiencia que en desktop) y reduce el `rotationRange`
-a la mitad, para que la rotación siga siendo visible sin depender del pin.
+"atascada", peor experiencia que en desktop) y reduce a la mitad tanto
+`rotationRange` como `pinDuration` (solo cuando `pinDuration` es un
+número — un valor de cadena tipo `"+=800"` no se puede dividir sin
+parsear la expresión de `ScrollTrigger`, así que un `pinDuration`
+personalizado en formato cadena queda igual en móvil y desktop).
+
+Reducir ambos a la vez mantiene la misma velocidad angular (grados por
+px) que en desktop — mismo "ritmo" de giro, menos rotación total — y es
+importante precisamente porque en móvil no hay pin: la sección se mueve
+con el scroll en vez de quedarse fija en pantalla, así que si
+`pinDuration` se quedara igual que en desktop (pensado para una rotación
+sostenida con el objeto inmóvil), el giro podría seguir a mitad de camino
+cuando la sección ya ha salido de la pantalla. Con la distancia también
+reducida, el giro se completa cómodamente dentro de la ventana natural en
+la que la sección es visible mientras pasa por el viewport.
+
 Si `prefers-reduced-motion` está activo, no hay pin ni rotación en ningún
 tamaño de pantalla: el objeto se muestra estático.

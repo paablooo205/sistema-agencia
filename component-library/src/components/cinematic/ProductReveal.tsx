@@ -30,7 +30,17 @@ const DEFAULT_MOBILE_BREAKPOINT = 768;
 // being centered on it. Total sweep (30°) is unchanged; only where it's
 // anchored changed.
 const DEFAULT_ROTATION_RANGE: [number, number] = [0, 30];
-const DEFAULT_PIN_DURATION = "+=1000";
+// Was "+=1000". At 30° total sweep, 1000px works out to 0.03°/px: a
+// single wheel notch (~100-120px) only covers 3-3.6°, and a normal single
+// scroll gesture (~200-500px) only covers 6-15° — 20-50% of the full
+// rotation. 1000px is also 40-55% of this whole demo page's entire
+// scrollable distance for one subtle rotation detail, not a centerpiece.
+// 500px halves the distance without making it feel instantaneous — a
+// normal-to-generous scroll gesture now completes it. Kept as a plain
+// number (not a "+=" string) so the mobile-halving below can divide it
+// the same way rotationRange is halved; the "+=" string form only gets
+// built at the point of use.
+const DEFAULT_PIN_DURATION = 500;
 
 /**
  * "sequence" (frame-scrubbing) is not implemented yet. The prop exists so
@@ -76,6 +86,28 @@ export function ProductReveal({
       ? [rotationRange[0] / 2, rotationRange[1] / 2]
       : rotationRange;
 
+    // Mobile has no pin (`pin: !isMobile` below), so the section scrolls
+    // past the viewport at native speed instead of being held on screen.
+    // A `pinDuration` sized for a *held* rotation risks the rotation
+    // still being mid-way when the (unpinned, moving) section has already
+    // scrolled out of view. Halving it alongside rotationRange keeps the
+    // same angular velocity (degrees per px) on both — same "speed", less
+    // total rotation — and the shorter distance completes comfortably
+    // inside the section's own natural scroll-through window. Only
+    // applies when pinDuration is a plain number (the default): a custom
+    // string like "+=800" is a relative ScrollTrigger expression we can't
+    // safely halve without parsing it, so a caller passing a string opts
+    // out of this adjustment and gets the same value on mobile and
+    // desktop.
+    const resolvedPinDuration =
+      isMobile && typeof pinDuration === "number"
+        ? pinDuration / 2
+        : pinDuration;
+    const resolvedEnd =
+      typeof resolvedPinDuration === "number"
+        ? `+=${resolvedPinDuration}`
+        : resolvedPinDuration;
+
     const tween = gsap.fromTo(
       object,
       { rotateY: fromDeg },
@@ -86,7 +118,7 @@ export function ProductReveal({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: typeof pinDuration === "number" ? `+=${pinDuration}` : pinDuration,
+          end: resolvedEnd,
           scrub: true,
           pin: !isMobile,
         },
