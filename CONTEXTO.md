@@ -1,193 +1,109 @@
-# CONTEXTO.md — Estado del Cinematic Web Engine
+# CONTEXTO.md — Estado de este worktree (debugging de ProductReveal)
 
-Última actualización: 2026-08-27, fin de la sesión de montaje de
-infraestructura. Este archivo existe para que una sesión de Claude Code
-nueva pueda leerlo y retomar exactamente donde lo dejamos, sin tener que
-reconstruir el hilo de decisiones desde cero.
-
-**Si estás retomando esto**: lee este archivo entero antes de tocar nada.
-La sección "Siguiente paso" al final es literalmente lo próximo a hacer.
+Última actualización: 2026-08-28, sesión de debugging de la rotación de
+`ProductReveal`. **Este archivo es propio de este worktree**
+(`.claude/worktrees/component-library-product-reveal/`, rama
+`worktree-component-library-product-reveal`) — no es el `CONTEXTO.md` de
+`_sistema/` en `master`, que sigue reflejando el estado general del
+Cinematic Web Engine y no se ha tocado. Si estás retomando esto, lee este
+archivo entero antes de tocar nada; la sección "Siguiente paso al
+retomar" es literalmente lo primero que hay que mirar.
 
 ## Qué es esto
 
-Cinematic Web Engine: sistema de agentes especializados (vía Claude Code)
-para construir webs cinematográficas/inmersivas (Next.js, GSAP,
-ScrollTrigger, Lenis, Three.js/R3F cuando aplique) a partir de un brief en
-lenguaje natural. El usuario actúa como director creativo, no como
-programador. Visión completa y spec original de agentes en
-`docs/cinematic-web-engine-vision.md` y `docs/spec-sistema-agentes.md`.
+Esta rama implementó `ProductReveal` (componente cinematográfico de
+`component-library/`, ver `docs/superpowers/plans/2026-08-27-component-library-product-reveal.md`
+para el plan original de 7 tareas, ya completado vía
+subagent-driven-development con revisión final limpia). Después de esa
+implementación, el usuario reportó que la rotación se veía con tirones /
+saltos / incompleta al probarla en el navegador, y desde entonces la
+sesión ha sido debugging puro, ronda a ronda, con disciplina estricta de
+"diagnóstico primero, hipótesis marcadas como tal, nada se aplica como
+fix confirmado sin evidencia".
 
-Esta sesión (y las que la precedieron sobre este tema) **no construyen la
-web de ningún cliente** — solo el motor/infraestructura compartida.
+## Fixes confirmados y ya commiteados en esta rama
 
-## Qué está construido y funcionando
+- **`f4f85e7`** — `rotationRange` por defecto cambiado de `[-15, 15]` a
+  `[0, 30]`. Motivo confirmado con logs reales (`liveRotateYDeg`): con
+  `scrub` ligado al progreso del pin, el valor "from" es lo que se ve
+  desde el primer instante — un rango centrado en 0 hace que el objeto
+  nunca se muestre de frente, arranca ya girado a un extremo. El barrido
+  total (30°) no cambió, solo el punto de anclaje.
+- **`09591c9`** — `pinDuration` por defecto cambiado de `"+=1000"` a
+  `500` (número, no cadena), y ahora se divide a la mitad en móvil junto
+  con `rotationRange` (mismo criterio: mantener la misma velocidad
+  angular, menos rotación total). Motivo confirmado por cálculo: a
+  1000px/30°, un gesto de scroll normal (200-500px) solo cubría 20-50%
+  del giro — exactamente el síntoma de "gira suave pero no llega al
+  final" que reportó el usuario.
 
-### 1. `_sistema/` (esta carpeta) — repo git local, 5 commits
+Ambos fixes están documentados también en `motion-recipes/product-rotation.md`
+(secciones Parámetros y Comportamiento móvil) y comentados en el propio
+código como `CONFIRMED FIX (not a hypothesis)`.
 
-```
-_sistema/
-├── CLAUDE.md                          ← reglas globales (stack, SEO, anti-AI-slop, gobernanza)
-├── CONTEXTO.md                        ← este archivo
-├── docs/
-│   ├── cinematic-web-engine-vision.md
-│   ├── spec-sistema-agentes.md
-│   └── superpowers/specs/
-│       └── 2026-08-27-component-library-design.md   ← spec aprobado, ver sección "A medias"
-├── component-library/README.md        ← solo documentación todavía, sin código (ver "A medias")
-├── motion-recipes/README.md           ← solo documentación todavía, sin recetas escritas
-└── reference-library/README.md        ← solo documentación todavía, vacía de contenido
-```
+## Hipótesis SIN confirmar — siguen en el árbol de trabajo, NO commiteadas
 
-### 2. Plugin `cinematic-web-engine` — `~/.claude/skills/cinematic-web-engine/`
+Todo esto vive solo en el working tree de
+`component-library/src/components/cinematic/ProductReveal.tsx` (y
+`lenis-provider.tsx`, commit `82f232b`, ese sí ya commiteado — ver más
+abajo). **No hacer commit de nada de esta sección todavía** — el usuario
+lo pidió explícitamente así al cerrar la sesión de hoy.
 
-**Esto NO está dentro de `_sistema/` ni bajo git** — vive en la carpeta de
-skills de usuario de Claude Code, fuera de cualquier proyecto, para estar
-disponible en cualquier carpeta de cliente que se abra en este ordenador.
+1. **`scrub: 0.5`** en vez de `scrub: true` — hipótesis para amortiguar
+   un salto brusco reportado inicialmente (franja diagonal fina). Marcada
+   `HYPOTHESIS, NOT CONFIRMED` en el código. Pendiente de que el usuario
+   la verifique visualmente en navegador.
+2. **`perspective: "1200px"` + `transformStyle: "preserve-3d"`** en el
+   `<section>` padre, y **`backfaceVisibility: "hidden"`** en el `<img>`
+   — hipótesis para el mismo salto (objeto apareciendo "de canto"). Ya se
+   descartó que esto pudiera romper el `pinType` de GSAP (comprobado
+   contra la fuente de `ScrollTrigger.js`: la detección de `pinType` no
+   inspecciona `perspective`/`transform`/`will-change` del propio
+   elemento). Sigue sin confirmarse visualmente.
+3. Todo el resto de instrumentación temporal (`markers: true`, logs en
+   `onEnter`/`onUpdate`, contador de renders, el log de "tween target
+   values" con `fromDeg`/`toDeg`/`isMobile`/`windowInnerWidth`) — pura
+   diagnosis, no cambia comportamiento, pero tampoco está commiteada.
 
-```
-cinematic-web-engine/
-├── .claude-plugin/plugin.json
-└── skills/
-    ├── creative-director/SKILL.md
-    ├── design-agent/SKILL.md
-    ├── motion-agent/SKILL.md
-    ├── 3d-agent/SKILL.md
-    ├── media-agent/SKILL.md
-    ├── frontend-agent/SKILL.md
-    ├── performance-agent/SKILL.md
-    ├── qa-art-critic/SKILL.md
-    └── nuevo-proyecto/SKILL.md        ← disable-model-invocation: true (solo invocación explícita)
-```
+`lenis-provider.tsx` SÍ tiene un fix ya commiteado (`82f232b`):
+`ScrollTrigger.refresh()` tras montar Lenis, para recalcular posiciones
+de pin una vez el scroll suave está activo (los efectos de hijo corren
+antes que los del padre, así que `ProductReveal` crea su pin antes de que
+`LenisProvider` termine de montarse).
 
-**Verificado funcionando de extremo a extremo** en `_test-cliente/`
-(carpeta vacía creada como sandbox de pruebas, hermana de `_sistema/` y
-`plantilla_base/` dentro de `Proyectos/`): la skill se invocó como
-`/cinematic-web-engine:nuevo-proyecto`, Creative Director leyó el brief,
-interpretó el encuadre y **se detuvo a pedir confirmación** antes de pasar
-a Design Agent — exactamente la disciplina de bloqueo por pasos que pedía
-el diseño original. El brief de prueba (cafetería) se descartó, no se
-llegó a confirmar el encuadre ni a invocar Design Agent.
+## Duda abierta — candidata más fuerte para la próxima ronda
 
-### 3. Variable de entorno `CINEMATIC_ENGINE_HOME`
+**Sospecha sin confirmar**: que el navegador del usuario lleva varias
+rondas evaluando `isMobile = true` porque `window.innerWidth` nunca
+volvió a confirmarse por encima de `mobileBreakpoint` (768px) tras
+ajustes de DevTools/zoom — lo cual explicaría *completamente* el "gira
+apenas unos grados" sin que ninguna de las hipótesis de arriba tenga
+nada que ver: con `isMobile = true`, `fromDeg/toDeg` salen `[0, 15]` en
+vez de `[0, 30]`, simplemente porque se está tomando la rama de móvil,
+no porque el tween esté mal.
 
-Fijada a nivel de usuario en Windows (`[Environment]::SetEnvironmentVariable`,
-scope `User`) apuntando a la ruta absoluta de `_sistema/`. Las 9 skills del
-plugin la usan para resolver `component-library/`, `motion-recipes/`,
-`reference-library/` y `CLAUDE.md` desde cualquier carpeta de cliente.
-**Confirmado que funciona** tras cerrar y reabrir VSCode del todo (abrir
-solo una terminal nueva dentro de la misma ventana de VSCode NO basta,
-porque el proceso padre ya tenía el entorno cacheado desde antes del
-`setx`).
+## Siguiente paso al retomar (literal, lo primero que hay que mirar)
 
-## Decisiones tomadas y por qué
-
-- **Env var, no ruta absoluta hardcodeada**, para referenciar
-  `component-library/`, `motion-recipes/`, `reference-library/` y
-  `CLAUDE.md` desde el plugin. Motivo: portabilidad — el plugin no debería
-  llevar cosido el path de un usuario concreto.
-- **`.claude/skills/<nombre>/` vía `claude plugin init`**, no un plugin de
-  marketplace. `claude plugin init` escanea directamente en
-  `~/.claude/skills/<nombre>/`, que se auto-carga como
-  `<nombre>@skills-dir` en cualquier sesión futura — soluciona "instalar a
-  nivel de usuario" sin pasos extra de `claude plugin install`.
-- **`skills/`, no `commands/`, para `nuevo-proyecto`**. Descubrimos
-  (contrastado contra la documentación oficial, no supuesto) que dentro de
-  un plugin `commands/` es solo el formato legado de definir skills como
-  archivo plano — la doc recomienda explícitamente `skills/` para plugins
-  nuevos. Todo son skills; no hay un mecanismo de "slash command" distinto
-  dentro de un plugin.
-- **Invocación real: `/cinematic-web-engine:nuevo-proyecto`**, no
-  `/nuevo-proyecto` a secas. El namespacing por nombre de plugin es
-  obligatorio en el sistema de plugins, no es una elección nuestra.
-- **`disable-model-invocation: true` en `nuevo-proyecto`**. Sin esto, al
-  ser una skill normal, Claude podría disparar el pipeline completo de 8
-  agentes solo por inferencia de contexto (p. ej. el usuario mencionando
-  un brief), sin invocación explícita. El resto de skills del pipeline sí
-  son model-invocable (así los pasos internos del pipeline las pueden
-  encadenar).
-- **`design-agent` posee `reference-library/`** (input y output, no solo
-  consulta) — decisión explícita del usuario: investigar referencias de
-  sector es parte del trabajo de Design Agent, no de un agente aparte.
-- **Sin agentes de fase posterior** (Auditor RLS, Performance de
-  infraestructura, Triage/SEO/A-B/BI) — se omiten del todo, sin carpetas
-  placeholder, porque dependen de clientes reales/infraestructura que no
-  existe todavía (Supabase, Vercel).
-- **`plantilla_base/` NO es la plantilla del Cinematic Web Engine** —
-  descubrimos que es un proyecto ya existente sin relación
-  (`handball-club-pwa`: Vite + React 19 + Supabase + react-router, para un
-  club de balonmano). La skill `frontend-agent` menciona "plantilla base
-  del sistema" de forma genérica; a día de hoy **no existe ninguna
-  plantilla Next.js/GSAP/Lenis real en `Proyectos/`** — ver "A medias".
-- **`component-library/` será en sí misma una app Next.js** (no un paquete
-  separado de una plantilla aparte), decidido explícitamente por el
-  usuario para no duplicar esfuerzo montando dos proyectos Next.js sin
-  tener aún un cliente real que lo justifique. Ver spec para el detalle.
-- **Alcance de la primera pasada de componentes: solo 1, `ProductReveal`**
-  (cambiado en la sesión del 2026-08-27 respecto al plan original de 3 —
-  `CinematicScene`, `ParallaxImage`, `TextReveal` — que quedan pospuestos).
-  Motivo del cambio: `ProductReveal` es el efecto que motivó el proyecto
-  (objeto que rota al hacer scroll) y el usuario quiso validar el pipeline
-  completo con el componente que más le importa, no con el más sencillo.
-  Sin dependencia técnica bloqueante de los otros componentes.
-- **`ProductReveal` tiene un prop `mode?: "css3d" | "sequence"`** (default
-  `"css3d"`) desde esta pasada, aunque `"sequence"` (frame-scrubbing con
-  `<canvas>` + pipeline ffmpeg) no se implementa todavía — solo existe el
-  tipo y un fallback a `"css3d"` con `console.warn` si se pasa
-  `"sequence"` antes de tiempo. Decisión explícita del usuario para que la
-  firma del componente no tenga que romperse cuando se añada el modo
-  secuencia más adelante.
-- **Sin shadcn/ui todavía** en `component-library/`: el `CLAUDE.md` lo
-  reserva para componentes UI no cinematográficos; `ProductReveal` no lo
-  necesita.
-- **Sin `.gitignore` en ningún nivel del repo `_sistema/` hasta esta
-  sesión** — se añade como primer paso del scaffold de
-  `component-library/`, antes del primer `npm install`, no como un ajuste
-  posterior.
-- **Sin tests automatizados en la primera pasada de componentes** (YAGNI)
-  — verificación manual en navegador (`npm run dev` + mirar cada demo
-  page) porque no hay lógica compleja más allá de props → comportamiento
-  visual.
-
-## A medias (lo importante)
-
-**`component-library/` sigue siendo solo un README.** El spec de diseño
-para la primera pasada (`ProductReveal` + 1 motion-recipe, tras el cambio
-de alcance del 2026-08-27) está **escrito, autorrevisado y aprobado por el
-usuario en chat**, en
-`docs/superpowers/specs/2026-08-27-component-library-design.md` — pero
-**no se ha escrito ni una línea de código todavía**. No existe
-`package.json`, no hay proyecto Next.js scaffolded, no hay componentes
-`.tsx`, no hay recetas en `motion-recipes/`, no hay `.gitignore`.
-
-`_test-cliente/` está vacía y limpia (el brief de prueba de la cafetería
-no dejó rastro) — lista para usarse de nuevo cuando haya un
-`component-library/` real que probar desde un proyecto de cliente.
-
-## Siguiente paso (literal, lo próximo a hacer)
-
-Seguíamos el proceso arquitectónico completo de la skill de brainstorming
-(`superpowers:brainstorming`), que para este spec exige:
-
-1. ~~Diseño presentado y aprobado en chat~~ ✔ hecho
-2. ~~Spec escrito, autorrevisado y commiteado~~ ✔ hecho
-   (`docs/superpowers/specs/2026-08-27-component-library-design.md`,
-   commit `e0cd917`)
-3. ~~El usuario revisa el spec escrito~~ ✔ hecho, en una sesión nueva
-   (2026-08-27): pidió 2 cambios — confirmar que faltaba `.gitignore`
-   (confirmado, no existía ninguno en el repo) y cambiar el alcance de 3
-   componentes a solo `ProductReveal`, con un prop `mode?: "css3d" |
-   "sequence"` (default `"css3d"`, `"sequence"` sin implementar todavía
-   pero con firma definitiva). Spec y este archivo actualizados en disco
-   para reflejarlo.
-4. **Siguiente acción de Claude**: invocar la skill
-   `superpowers:writing-plans` para generar el plan de implementación —
-   **no** implementar directamente sin pasar por ese plan, es la regla
-   dura de la skill de brainstorming para el camino arquitectónico.
-5. Tras el plan: implementar (scaffold Next.js en `component-library/`
-   empezando por `.gitignore`, `ProductReveal`, el `LenisProvider`, la
-   demo page `/product-reveal`, actualizar `component-library/README.md`,
-   escribir `product-rotation.md` en `motion-recipes/`), verificar con
-   `npm run dev` en el navegador, commitear.
-6. Después de eso: el usuario quiere ver un ejemplo real (un proyecto de
-   cliente de prueba usando `/cinematic-web-engine:nuevo-proyecto` de
-   verdad) — sus palabras fueron "cuando esté todo veremos un ejemplo".
+1. Reload completo de `http://localhost:3000/product-reveal` con la
+   consola abierta (el servidor de dev puede necesitar reinicio — revisar
+   qué proceso tiene el puerto 3000 antes de arrancar otro, esta sesión
+   acumuló varios procesos huérfanos de `next dev` a lo largo de las
+   rondas).
+2. Leer **una sola línea**: `[ProductReveal debug] tween target values
+   (one-time):` — trae `windowInnerWidth`, `mobileBreakpointUsed`,
+   `isMobile`, `fromDeg`, `toDeg` juntos. Esto resuelve la duda abierta
+   antes que ninguna otra cosa:
+   - Si `windowInnerWidth < 768` → la causa es el viewport/DevTools, no
+     el componente. Ensanchar la ventana (o cerrar/desacoplar DevTools) y
+     repetir la prueba visual antes de tocar nada más.
+   - Si `windowInnerWidth >= 768` y aun así `isMobile: true` o
+     `fromDeg/toDeg` no son `[0, 30]` → eso sí sería un bug real en la
+     lógica de `ProductReveal`, a investigar desde cero.
+3. Solo después de descartar eso: retomar la verificación visual de las
+   hipótesis de `scrub`/`perspective`/`backface-visibility` pendientes,
+   y decidir si se confirman (documentar como fix real, commit propio,
+   igual que `rotationRange`/`pinDuration`) o se revierten.
+4. Una vez cerrado todo lo anterior: limpiar toda la instrumentación
+   temporal (`console.log`, `markers: true`, contador de renders) antes
+   del commit final de esta ronda de debugging — nada de eso debe llegar
+   a la versión "limpia" del componente.
