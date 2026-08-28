@@ -36,9 +36,16 @@ Implementado por `ProductReveal`
 
 ## Parámetros
 - `rotationRange?: [number, number]` — grados de rotación, default
-  `[-15, 15]`. Un rango pequeño (15-20°) lee como "objeto que se puede
-  apreciar desde otro ángulo"; rangos grandes (90°+) leen como giro
-  completo y necesitan `mode: "sequence"` para no verse plano/falso.
+  `[0, 30]`. Un barrido pequeño (30° totales) lee como "objeto que se
+  puede apreciar desde otro ángulo"; barridos grandes (90°+) leen como
+  giro completo y necesitan `mode: "sequence"` para no verse plano/falso.
+  **El rango arranca en 0° (de frente), no está centrado en 0** — con
+  `scrub` ligado directamente al progreso del pin, el valor "from" del
+  rango es lo que se ve nada más aparecer el objeto (incluso antes de
+  que el pin se active), así que un rango centrado en 0 (p. ej. `[-15,
+  15]`, la elección original de esta pasada) hace que el objeto nunca se
+  muestre de frente — empieza ya girado hacia un extremo, contradiciendo
+  el "aparición Y rotación progresiva" del objetivo de este componente.
 - `pinDuration?: string | number` — largo del tramo pineado en unidades de
   `ScrollTrigger` `end`, default `"+=1000"` (1000px de scroll).
 - `mobileBreakpoint?: number` — ancho en px por debajo del cual se aplica

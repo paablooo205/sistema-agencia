@@ -19,7 +19,17 @@ export interface ProductRevealProps {
 }
 
 const DEFAULT_MOBILE_BREAKPOINT = 768;
-const DEFAULT_ROTATION_RANGE: [number, number] = [-15, 15];
+// Was [-15, 15]. With scrub tied directly to pin progress, the tween's
+// "from" value is what's visible the instant the pin engages (and,
+// before that, for the whole time the object is on screen but not yet
+// pinned — gsap.fromTo renders the "from" state pre-scroll too). A range
+// centered on 0 means the object is never shown facing forward at all;
+// it starts already turned to one extreme. The spec calls for
+// "aparición Y rotación progresiva" — the object should read as facing
+// forward, then turning — so the range now starts at 0° instead of
+// being centered on it. Total sweep (30°) is unchanged; only where it's
+// anchored changed.
+const DEFAULT_ROTATION_RANGE: [number, number] = [0, 30];
 const DEFAULT_PIN_DURATION = "+=1000";
 
 /**
