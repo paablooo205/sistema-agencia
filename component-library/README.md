@@ -43,7 +43,7 @@ originó.
 | `ProductReveal` | Aparición progresiva de un producto/objeto protagonista. |
 | `ClipPathReveal` | Revelado mediante `clip-path`. |
 | `PageTransition` | Transición entre páginas/vistas. |
-| `ThreeScene` | Contenedor de escena Three.js/R3F. |
+| `ThreeScene` | Contenedor de escena Three.js/R3F. Cuando se construya, debe soportar cargar un modelo `.glb` externo (diseñado por el usuario en herramientas como Meshy/Tripo/Sloyd) y rotarlo mediante scroll con React Three Fiber — es la técnica prevista para reemplazar/complementar el modo `mode: "sequence"` pendiente de `ProductReveal` cuando haya modelos 3D reales disponibles. Próximo paso tras cerrar `ProductReveal`, no implementado todavía. |
 | `ParticleScene` | Sistema de partículas. |
 
 ## Estado
