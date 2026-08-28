@@ -19,6 +19,14 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     gsap.ticker.add(syncLenisWithGsapTicker);
     gsap.ticker.lagSmoothing(0);
 
+    // ProductReveal (and other consumers) create their ScrollTrigger
+    // pins in an effect that runs before this one (child effects fire
+    // before the parent's), so their pin start/end positions get
+    // calculated before Lenis is actually driving scroll. Refresh once
+    // Lenis is wired up so those positions are recalculated against the
+    // real scroll driver, not just the native pre-Lenis layout.
+    ScrollTrigger.refresh();
+
     return () => {
       gsap.ticker.remove(syncLenisWithGsapTicker);
       lenis.destroy();
