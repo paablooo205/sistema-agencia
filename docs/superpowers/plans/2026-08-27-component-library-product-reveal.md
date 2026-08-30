@@ -66,20 +66,26 @@ Tailwind CSS v4, GSAP + ScrollTrigger (core, free), `lenis`, npm.
 
 - [ ] **Step 1: Preserve the existing README before scaffolding**
 
-`create-next-app` may overwrite `README.md`. Back it up first.
+`create-next-app` checks that its target directory is empty (or contains
+only a small allowlist of files like `.git`/`LICENSE`) before scaffolding
+— `README.md` is not on that allowlist, and neither would a `README.md.bak`
+left inside the same directory. Move the file one level up, out of
+`component-library/` entirely, not just to a `.bak` name in place.
 
 Run:
 ```bash
 cd "component-library"
-mv README.md README.md.bak
+mv README.md ../README.md.component-library.bak
 ```
 
 - [ ] **Step 2: Run create-next-app non-interactively**
 
 Run (from inside `component-library/`, target `.` so it scaffolds in
-place):
+place). Pin the major version to 15 explicitly — `@latest` will resolve to
+whatever is newest at the time (already caught once resolving to Next.js
+16, which contradicts this plan's Global Constraints):
 ```bash
-npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack
+npx --yes create-next-app@15 . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --no-turbopack
 ```
 
 Expected: command completes without prompting (all decision flags were
@@ -107,7 +113,7 @@ original so nothing is lost:
 Run:
 ```bash
 mv README.md README.md.bak.generated
-mv README.md.bak README.md
+mv ../README.md.component-library.bak README.md
 ```
 
 Keep `README.md.bak.generated` around only until Task 6 is done (it gets
