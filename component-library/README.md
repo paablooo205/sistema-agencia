@@ -30,7 +30,7 @@ originó.
 
 | Componente | Propósito |
 |---|---|
-| `CinematicScene` | Contenedor base de una escena cinematográfica dentro del scroll. |
+| `CinematicScene` | Contenedor base de una escena cinematográfica dentro del scroll. **Nota de fricción real** (detectada en el test end-to-end `clientes/_prueba-1`, Nortea): el componente fuerza `items-center justify-center` en su propia base, sin ningún prop que permita cambiar la alineación interna. Al reutilizarlo con una composición asimétrica (anclaje arriba-izquierda en vez de centrado), hubo que forzar la sobrescritura con el modificador `!important` de Tailwind (`!items-start !justify-start`) vía la prop `className` — funciona, pero es un parche, no una API limpia. Si se vuelve a tocar este componente, considerar añadir un prop `align?` (o similar) en vez de depender de que quien lo consuma sepa recurrir a `!important`. No corregido todavía — solo documentado. |
 | `PinnedScene` | Escena fijada (pin) durante un tramo de scroll. |
 | `ParallaxImage` | Imagen con profundidad/movimiento relativo al scroll. |
 | `ScrollImage` | Imagen cuyo estado (escala, posición, crop) evoluciona con el scroll. |
