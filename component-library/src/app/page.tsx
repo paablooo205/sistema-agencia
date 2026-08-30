@@ -2,11 +2,12 @@ import Link from "next/link";
 
 const DEMOS = [
   { href: "/product-reveal", label: "ProductReveal demo" },
-  { href: "/three-scene", label: "ThreeScene demo" },
+  { href: "/product-3d-closeout", label: "Product3DCloseout demo" },
   { href: "/cinematic-scene", label: "CinematicScene demo" },
   { href: "/parallax-image", label: "ParallaxImage demo" },
   { href: "/text-reveal", label: "TextReveal demo" },
   { href: "/brand-reveal", label: "BrandReveal demo" },
+  { href: "/image-sequence", label: "ImageSequence demo" },
 ];
 
 export default function Home() {
