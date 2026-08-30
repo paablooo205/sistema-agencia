@@ -1,1 +1,8 @@
 .superpowers/
+
+# Capturas de referencia visual — material de inspiración crudo, se queda
+# en disco local para consulta pero no en el repo (peso, no es contenido
+# reusable en sí mismo; las entradas .md que las documentan sí se versionan).
+reference-library/*.png
+reference-library/*.jpg
+reference-library/*.jpeg
