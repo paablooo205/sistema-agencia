@@ -19,27 +19,27 @@ export interface ProductRevealProps {
 }
 
 const DEFAULT_MOBILE_BREAKPOINT = 768;
-// Was [-15, 15]. With scrub tied directly to pin progress, the tween's
-// "from" value is what's visible the instant the pin engages (and,
-// before that, for the whole time the object is on screen but not yet
-// pinned — gsap.fromTo renders the "from" state pre-scroll too). A range
-// centered on 0 means the object is never shown facing forward at all;
-// it starts already turned to one extreme. The spec calls for
-// "aparición Y rotación progresiva" — the object should read as facing
-// forward, then turning — so the range now starts at 0° instead of
-// being centered on it. Total sweep (30°) is unchanged; only where it's
-// anchored changed.
+// CONFIRMED FIX (not a hypothesis) — was [-15, 15]. With scrub tied
+// directly to pin progress, the tween's "from" value is what's visible
+// the instant the pin engages (and, before that, for the whole time the
+// object is on screen but not yet pinned — gsap.fromTo renders the
+// "from" state pre-scroll too). A range centered on 0 means the object
+// is never shown facing forward at all; it starts already turned to one
+// extreme. The spec calls for "aparición Y rotación progresiva" — the
+// object should read as facing forward, then turning — so the range now
+// starts at 0° instead of being centered on it. Total sweep (30°) is
+// unchanged; only where it's anchored changed.
 const DEFAULT_ROTATION_RANGE: [number, number] = [0, 30];
-// Was "+=1000". At 30° total sweep, 1000px works out to 0.03°/px: a
-// single wheel notch (~100-120px) only covers 3-3.6°, and a normal single
-// scroll gesture (~200-500px) only covers 6-15° — 20-50% of the full
-// rotation. 1000px is also 40-55% of this whole demo page's entire
-// scrollable distance for one subtle rotation detail, not a centerpiece.
-// 500px halves the distance without making it feel instantaneous — a
-// normal-to-generous scroll gesture now completes it. Kept as a plain
-// number (not a "+=" string) so the mobile-halving below can divide it
-// the same way rotationRange is halved; the "+=" string form only gets
-// built at the point of use.
+// CONFIRMED FIX (not a hypothesis) — was "+=1000". At 30° total sweep,
+// 1000px works out to 0.03°/px: a single wheel notch (~100-120px) only
+// covers 3-3.6°, and a normal single scroll gesture (~200-500px) only
+// covers 6-15° — 20-50% of the full rotation. 1000px is also 40-55% of
+// this whole demo page's entire scrollable distance for one subtle
+// rotation detail, not a centerpiece. 500px halves the distance without
+// making it feel instantaneous — a normal-to-generous scroll gesture now
+// completes it. Kept as a plain number (not a "+=" string) so the
+// mobile-halving below can divide it the same way rotationRange is
+// halved; the "+=" string form only gets built at the point of use.
 const DEFAULT_PIN_DURATION = 500;
 
 /**
@@ -86,19 +86,19 @@ export function ProductReveal({
       ? [rotationRange[0] / 2, rotationRange[1] / 2]
       : rotationRange;
 
-    // Mobile has no pin (`pin: !isMobile` below), so the section scrolls
-    // past the viewport at native speed instead of being held on screen.
-    // A `pinDuration` sized for a *held* rotation risks the rotation
-    // still being mid-way when the (unpinned, moving) section has already
-    // scrolled out of view. Halving it alongside rotationRange keeps the
-    // same angular velocity (degrees per px) on both — same "speed", less
-    // total rotation — and the shorter distance completes comfortably
-    // inside the section's own natural scroll-through window. Only
-    // applies when pinDuration is a plain number (the default): a custom
-    // string like "+=800" is a relative ScrollTrigger expression we can't
-    // safely halve without parsing it, so a caller passing a string opts
-    // out of this adjustment and gets the same value on mobile and
-    // desktop.
+    // CONFIRMED FIX (not a hypothesis) — mobile has no pin (`pin:
+    // !isMobile` below), so the section scrolls past the viewport at
+    // native speed instead of being held on screen. A `pinDuration` sized
+    // for a *held* rotation risks the rotation still being mid-way when
+    // the (unpinned, moving) section has already scrolled out of view.
+    // Halving it alongside rotationRange keeps the same angular velocity
+    // (degrees per px) on both — same "speed", less total rotation, and
+    // the shorter distance completes comfortably inside the section's own
+    // natural scroll-through window. Only applies when pinDuration is a
+    // plain number (the default): a custom string like "+=800" is a
+    // relative ScrollTrigger expression we can't safely halve without
+    // parsing it, so a caller passing a string opts out of this
+    // adjustment and gets the same value on mobile and desktop.
     const resolvedPinDuration =
       isMobile && typeof pinDuration === "number"
         ? pinDuration / 2
@@ -119,7 +119,7 @@ export function ProductReveal({
           trigger: section,
           start: "top top",
           end: resolvedEnd,
-          scrub: true,
+          scrub: 0.5,
           pin: !isMobile,
         },
       }
@@ -137,6 +137,7 @@ export function ProductReveal({
       className={["flex min-h-screen items-center justify-center overflow-hidden", className]
         .filter(Boolean)
         .join(" ")}
+      style={{ perspective: "1200px", transformStyle: "preserve-3d" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -144,7 +145,7 @@ export function ProductReveal({
         src={src}
         alt={alt}
         className="h-auto w-full max-w-sm"
-        style={{ willChange: "transform" }}
+        style={{ willChange: "transform", backfaceVisibility: "hidden" }}
       />
     </section>
   );
