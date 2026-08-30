@@ -9,6 +9,6 @@
 - Transition: Entre proyectos, el objeto gira/cambia de faceta en vez de cortar a una imagen nueva — la transición ES la rotación, no un fundido.
 - Typography: Mono técnico para las etiquetas HUD, tracking amplio, todo mayúsculas.
 - Storytelling: Cada proyecto de portfolio se lee como una "muestra" o "espécimen" siendo escaneado/rotado por un instrumento, no como una tarjeta de galería — refuerza precisión/tecnicismo sobre el propio contenido de cada proyecto.
-- Useful for: Portfolios donde se quiere transmitir precisión técnica o carácter "de laboratorio" — relevante para el vocabulario de `ThreeScene` (rotación de objeto 3D ligada a scroll) que ya existe en `component-library/`, con la capa HUD como posible receta nueva si se reutiliza.
+- Useful for: Portfolios donde se quiere transmitir precisión técnica o carácter "de laboratorio" — relevante para el vocabulario de rotación de objeto 3D ligada a scroll que usan `Product3DCloseout` (ya implementado, aunque como parte de una secuencia mucho más específica) y `ThreeScene` (contenedor 3D genérico, todavía pendiente), con la capa HUD como posible receta nueva si se reutiliza.
 - Avoid when: Portfolio de contenido cálido/editorial (este patrón lee frío y técnico a propósito) — no encaja con direcciones de marca como Nortea (café, cálido-editorial).
 - Source: Capturas de pantalla proporcionadas por el usuario (30-08-2026), sitio no identificado por URL — marca no visible en el recorte. Sin verificar en vivo.

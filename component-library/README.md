@@ -43,7 +43,8 @@ originó.
 | `ProductReveal` | Aparición progresiva de un producto/objeto protagonista. |
 | `ClipPathReveal` | Revelado mediante `clip-path`. |
 | `PageTransition` | Transición entre páginas/vistas. |
-| `ThreeScene` | Contenedor de escena Three.js/R3F. Cuando se construya, debe soportar cargar un modelo `.glb` externo (diseñado por el usuario en herramientas como Meshy/Tripo/Sloyd) y rotarlo mediante scroll con React Three Fiber — es la técnica prevista para reemplazar/complementar el modo `mode: "sequence"` pendiente de `ProductReveal` cuando haya modelos 3D reales disponibles. Próximo paso tras cerrar `ProductReveal`, no implementado todavía. |
+| `ThreeScene` | Contenedor genérico de escena Three.js/R3F (cargar un `.glb`, cámara/luz por defecto, rotación simple ligada a scroll). Pendiente — no confundir con `Product3DCloseout` (abajo), que es una secuencia compuesta mucho más específica construida aparte, no una implementación de este componente genérico. |
+| `Product3DCloseout` | Secuencia de cierre de marca en 3D: un producto (`.glb`) rota, crece y viaja de esquina a esquina del encuadre mientras el fondo de la sección funde a su color y una palabra se revela letra a letra, flotando como un globo, antes de que el producto se desvanezca. Pensada como momento final de página, no como contenedor 3D reutilizable de propósito general (para eso, `ThreeScene`, todavía pendiente). Implementado (`src/components/cinematic/Product3DCloseout.tsx`), demo en `/product-3d-closeout`. |
 | `ParticleScene` | Sistema de partículas. |
 
 ## Estado
