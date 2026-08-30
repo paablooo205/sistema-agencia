@@ -1,109 +1,95 @@
-# CONTEXTO.md — Estado de este worktree (debugging de ProductReveal)
+# CONTEXTO.md — Estado real de `_sistema/` (component-library)
 
-Última actualización: 2026-08-28, sesión de debugging de la rotación de
-`ProductReveal`. **Este archivo es propio de este worktree**
-(`.claude/worktrees/component-library-product-reveal/`, rama
-`worktree-component-library-product-reveal`) — no es el `CONTEXTO.md` de
-`_sistema/` en `master`, que sigue reflejando el estado general del
-Cinematic Web Engine y no se ha tocado. Si estás retomando esto, lee este
-archivo entero antes de tocar nada; la sección "Siguiente paso al
-retomar" es literalmente lo primero que hay que mirar.
+Última actualización: 2026-08-30. Reemplaza por completo el contenido
+anterior de este archivo (una nota de handoff del 2026-08-28 sobre
+debugging de `ProductReveal` en el worktree
+`.claude/worktrees/component-library-product-reveal/` — ese trabajo ya
+se mergeó a `master` hace tiempo y está resuelto, no queda nada abierto
+de esa ronda). Si retomas esto, lee esta versión, no confíes en memoria
+de una sesión anterior sobre lo que dice este archivo.
 
-## Qué es esto
+Todo el trabajo de hoy ha ocurrido directamente en
+`_sistema/component-library/` (el checkout de `master`), no en ningún
+worktree — no hay ningún worktree activo relevante ahora mismo.
 
-Esta rama implementó `ProductReveal` (componente cinematográfico de
-`component-library/`, ver `docs/superpowers/plans/2026-08-27-component-library-product-reveal.md`
-para el plan original de 7 tareas, ya completado vía
-subagent-driven-development con revisión final limpia). Después de esa
-implementación, el usuario reportó que la rotación se veía con tirones /
-saltos / incompleta al probarla en el navegador, y desde entonces la
-sesión ha sido debugging puro, ronda a ronda, con disciplina estricta de
-"diagnóstico primero, hipótesis marcadas como tal, nada se aplica como
-fix confirmado sin evidencia".
+## Componentes cerrados hoy (construidos, verificados en navegador por
+el usuario, commiteados)
 
-## Fixes confirmados y ya commiteados en esta rama
+- **`CinematicScene`**, **`ParallaxImage`**, **`TextReveal`** — cerrados
+  al principio de la sesión de hoy (ver commits `f911128`, `77f6efc`,
+  `8ebf350`). `CinematicScene` tiene una fricción real documentada en
+  `component-library/README.md`: fuerza `items-center justify-center`
+  sin prop de alineación, hubo que forzar con `!important` al reutilizarlo
+  con composición asimétrica. No corregido, solo documentado.
+- **`BrandReveal`** — reveal de marca al cargar (clip-path + tracking),
+  sin scroll. Commit `7d4e1a1`.
+- **`ImageSequence`** — secuencia de frames controlada por scroll
+  (canvas + `drawImage`, precarga completa antes de habilitar el scrub
+  — confirmado por lectura de código, no solo por diseño). Consume la
+  secuencia de 120 frames de `botella_fanta.glb` generada con Puppeteer
+  (`scripts/generate-frame-sequence.mjs`, `public/sequences/botella-360/`,
+  commits `1b19a67` y `b709f27`). Demo en `/image-sequence`. **Está
+  construido y commiteado — si alguien dice que sigue pendiente, no es
+  cierto a día de hoy, verificar antes de asumirlo.**
+- **`Product3DCloseout`** (antes `ThreeScene`) — secuencia de cierre de
+  marca en 3D: producto `.glb` rota + crece + viaja de esquina a esquina
+  mientras el fondo de la sección funde a `backgroundTintColor` (prop
+  nueva, separada de `color` — antes eran el mismo valor) y una palabra
+  se revela letra a letra flotando como un globo, antes de que el
+  producto se desvanezca. Renombrado desde `ThreeScene` porque ya no
+  era un contenedor 3D genérico. Commit `9f7c641`. Demo en
+  `/product-3d-closeout`. Fuente actual usada en la demo:
+  `botella_fanta.glb`.
 
-- **`f4f85e7`** — `rotationRange` por defecto cambiado de `[-15, 15]` a
-  `[0, 30]`. Motivo confirmado con logs reales (`liveRotateYDeg`): con
-  `scrub` ligado al progreso del pin, el valor "from" es lo que se ve
-  desde el primer instante — un rango centrado en 0 hace que el objeto
-  nunca se muestre de frente, arranca ya girado a un extremo. El barrido
-  total (30°) no cambió, solo el punto de anclaje.
-- **`09591c9`** — `pinDuration` por defecto cambiado de `"+=1000"` a
-  `500` (número, no cadena), y ahora se divide a la mitad en móvil junto
-  con `rotationRange` (mismo criterio: mantener la misma velocidad
-  angular, menos rotación total). Motivo confirmado por cálculo: a
-  1000px/30°, un gesto de scroll normal (200-500px) solo cubría 20-50%
-  del giro — exactamente el síntoma de "gira suave pero no llega al
-  final" que reportó el usuario.
+## Pendiente real
 
-Ambos fixes están documentados también en `motion-recipes/product-rotation.md`
-(secciones Parámetros y Comportamiento móvil) y comentados en el propio
-código como `CONFIRMED FIX (not a hypothesis)`.
+- **`ThreeScene`** (el nombre, no `Product3DCloseout`) vuelve a estar
+  sin construir — su entrada en `component-library/README.md` es de
+  nuevo genérica ("contenedor Three.js/R3F simple, rotación ligada a
+  scroll"). No confundir con `Product3DCloseout`, que es harina de otro
+  costal.
+- **Arquitectura de distribución de `component-library/`** — sin
+  resolver, ver `docs/superpowers/decisions/2026-08-30-component-library-distribution-gap.md`.
+  El proyecto de prueba `clientes/_prueba-1/` (Nortea) sigue usando el
+  parche temporal de duplicar componentes en vez de importarlos.
+- **"La idea de la chapa"** — el usuario mencionó esto al cerrar la
+  sesión de hoy sin describirla; esta sesión no tiene contexto sobre en
+  qué consiste, y no se ha inventado nada al respecto. Lo único
+  verificado hoy: `botella_fanta.glb` tiene **un único mesh** (`meshes:
+  1`, `nodes: 1` en el JSON del propio archivo `.glb`) — no hay ninguna
+  pieza separada para una chapa/tapón en el modelo actual, es toda una
+  sola geometría. Si la idea depende de tener la chapa como pieza
+  independiente (separable, con su propio material/animación), el
+  modelo actual no lo permite tal cual — haría falta un `.glb` nuevo con
+  esa pieza separada, o descomponer la geometría existente. **Pedir al
+  usuario que describa la idea antes de intentar nada aquí.**
 
-## Hipótesis SIN confirmar — siguen en el árbol de trabajo, NO commiteadas
+## Estado de Git
 
-Todo esto vive solo en el working tree de
-`component-library/src/components/cinematic/ProductReveal.tsx` (y
-`lenis-provider.tsx`, commit `82f232b`, ese sí ya commiteado — ver más
-abajo). **No hacer commit de nada de esta sección todavía** — el usuario
-lo pidió explícitamente así al cerrar la sesión de hoy.
+Rama `master`, 12 commits por delante de `origin/master` y 1 por detrás
+(divergencia sin resolver desde antes de hoy, no se ha tocado). Sin
+push en toda la sesión de hoy, tal como se ha pedido explícitamente cada
+vez. Working tree limpio salvo `.claude/` y `clientes/` (ambos fuera del
+control de versiones de este repo a propósito).
 
-1. **`scrub: 0.5`** en vez de `scrub: true` — hipótesis para amortiguar
-   un salto brusco reportado inicialmente (franja diagonal fina). Marcada
-   `HYPOTHESIS, NOT CONFIRMED` en el código. Pendiente de que el usuario
-   la verifique visualmente en navegador.
-2. **`perspective: "1200px"` + `transformStyle: "preserve-3d"`** en el
-   `<section>` padre, y **`backfaceVisibility: "hidden"`** en el `<img>`
-   — hipótesis para el mismo salto (objeto apareciendo "de canto"). Ya se
-   descartó que esto pudiera romper el `pinType` de GSAP (comprobado
-   contra la fuente de `ScrollTrigger.js`: la detección de `pinType` no
-   inspecciona `perspective`/`transform`/`will-change` del propio
-   elemento). Sigue sin confirmarse visualmente.
-3. Todo el resto de instrumentación temporal (`markers: true`, logs en
-   `onEnter`/`onUpdate`, contador de renders, el log de "tween target
-   values" con `fromDeg`/`toDeg`/`isMobile`/`windowInnerWidth`) — pura
-   diagnosis, no cambia comportamiento, pero tampoco está commiteada.
+Últimos 6 commits (más reciente primero):
+```
+9f7c641 Rename ThreeScene to Product3DCloseout, restore ThreeScene as generic pending
+b709f27 Add ImageSequence component: scroll-scrubbed canvas frame sequence
+1b19a67 Add Puppeteer frame-sequence generation tooling, regenerate botella-360 at 120 frames
+eb7aee5 Add 8 reference-library entries from user-provided screenshots
+e035276 Warn against unprotected text overlays on parallax images
+e1ec6d7 Record component-library distribution architecture as an open ADR
+```
 
-`lenis-provider.tsx` SÍ tiene un fix ya commiteado (`82f232b`):
-`ScrollTrigger.refresh()` tras montar Lenis, para recalcular posiciones
-de pin una vez el scroll suave está activo (los efectos de hijo corren
-antes que los del padre, así que `ProductReveal` crea su pin antes de que
-`LenisProvider` termine de montarse).
+## Siguiente paso al retomar
 
-## Duda abierta — candidata más fuerte para la próxima ronda
-
-**Sospecha sin confirmar**: que el navegador del usuario lleva varias
-rondas evaluando `isMobile = true` porque `window.innerWidth` nunca
-volvió a confirmarse por encima de `mobileBreakpoint` (768px) tras
-ajustes de DevTools/zoom — lo cual explicaría *completamente* el "gira
-apenas unos grados" sin que ninguna de las hipótesis de arriba tenga
-nada que ver: con `isMobile = true`, `fromDeg/toDeg` salen `[0, 15]` en
-vez de `[0, 30]`, simplemente porque se está tomando la rama de móvil,
-no porque el tween esté mal.
-
-## Siguiente paso al retomar (literal, lo primero que hay que mirar)
-
-1. Reload completo de `http://localhost:3000/product-reveal` con la
-   consola abierta (el servidor de dev puede necesitar reinicio — revisar
-   qué proceso tiene el puerto 3000 antes de arrancar otro, esta sesión
-   acumuló varios procesos huérfanos de `next dev` a lo largo de las
-   rondas).
-2. Leer **una sola línea**: `[ProductReveal debug] tween target values
-   (one-time):` — trae `windowInnerWidth`, `mobileBreakpointUsed`,
-   `isMobile`, `fromDeg`, `toDeg` juntos. Esto resuelve la duda abierta
-   antes que ninguna otra cosa:
-   - Si `windowInnerWidth < 768` → la causa es el viewport/DevTools, no
-     el componente. Ensanchar la ventana (o cerrar/desacoplar DevTools) y
-     repetir la prueba visual antes de tocar nada más.
-   - Si `windowInnerWidth >= 768` y aun así `isMobile: true` o
-     `fromDeg/toDeg` no son `[0, 30]` → eso sí sería un bug real en la
-     lógica de `ProductReveal`, a investigar desde cero.
-3. Solo después de descartar eso: retomar la verificación visual de las
-   hipótesis de `scrub`/`perspective`/`backface-visibility` pendientes,
-   y decidir si se confirman (documentar como fix real, commit propio,
-   igual que `rotationRange`/`pinDuration`) o se revierten.
-4. Una vez cerrado todo lo anterior: limpiar toda la instrumentación
-   temporal (`console.log`, `markers: true`, contador de renders) antes
-   del commit final de esta ronda de debugging — nada de eso debe llegar
-   a la versión "limpia" del componente.
+1. Si vas a tocar `Product3DCloseout`: leerlo entero primero, tiene
+   varias decisiones no triviales (por qué no hay compensación de
+   cámara, por qué `scrub: 0.5` sí aplica aquí y no en `CinematicScene`,
+   por qué el material lleva `transparent: true`).
+2. Si el usuario menciona "la chapa": pedir que la describa antes de
+   escribir código — no hay contexto previo que inferir.
+3. La divergencia con `origin/master` (12/1) sigue sin resolverse — no
+   es urgente pero conviene saber que está ahí antes de cualquier
+   `push`/`pull`.
