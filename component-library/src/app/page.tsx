@@ -6,6 +6,7 @@ const DEMOS = [
   { href: "/cinematic-scene", label: "CinematicScene demo" },
   { href: "/parallax-image", label: "ParallaxImage demo" },
   { href: "/text-reveal", label: "TextReveal demo" },
+  { href: "/brand-reveal", label: "BrandReveal demo" },
 ];
 
 export default function Home() {
