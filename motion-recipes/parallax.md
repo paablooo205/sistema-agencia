@@ -17,6 +17,20 @@ relativa aporta una lectura más cinematográfica que una imagen estática.
   ejemplo, alineada a pixel con texto adyacente) — el parallax por diseño
   desplaza la imagen dentro de su contenedor.
 
+## ⚠️ Advertencia — overlay de texto sobre la imagen (encontrado en QA, proyecto `_prueba-1`)
+Si se superpone texto directamente sobre la imagen (p. ej. una ficha
+técnica, un caption) **sin scrim/sombra de texto/gradiente de protección
+detrás**, la legibilidad depende por completo de que esa zona concreta de
+la imagen tenga contraste suficiente con el texto — funciona por
+casualidad con una imagen de marcador de posición de color plano, pero
+se rompe en cuanto se sustituye por una fotografía real con variación
+tonal en esa zona. QA/Art Critic lo detectó en `_prueba-1` (Nortea,
+escena de grano/tueste) como severidad media, no bloqueante para un
+placeholder pero sí antes de reutilizar el patrón con fotografía real de
+cliente. Si se superpone texto, añadir scrim (gradiente oscuro sutil
+detrás del texto) o `text-shadow`/contorno — no asumir que el placeholder
+de verificación representa el contraste real que tendrá la foto final.
+
 ## Implementación
 Implementado por `ParallaxImage`
 (`component-library/src/components/cinematic/ParallaxImage.tsx`).
