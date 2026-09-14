@@ -55,10 +55,58 @@ de esta tabla: pendientes.
 
 ## Desarrollo
 
+Este paquete vive dentro del workspace de npm de `_sistema/` — instalar
+**desde la raíz del repo** (`npm install`), nunca desde aquí dentro. Ver
+`README.md` de la raíz para el detalle del flujo de instalación.
+
+Para levantar el servidor de desarrollo de este paquete en concreto:
+
 ```bash
-npm install
-npm run dev
+npm run dev --workspace=@sistema/component-library
 ```
+
+(equivalente a `cd packages/component-library && npm run dev`, si ya se
+instaló desde la raíz).
 
 Abrir `http://localhost:3000` — el índice enlaza a la demo de cada
 componente implementado.
+
+## Cómo consumirlo desde un proyecto de cliente
+
+El paquete se publica dentro del workspace como `@sistema/component-library`,
+con un barrel (`src/index.ts`) que reexporta todos los componentes
+terminados. Un proyecto de cliente nuevo en `apps/clientes/<nombre>/`:
+
+1. Declara la dependencia en su propio `package.json`:
+
+   ```json
+   {
+     "dependencies": {
+       "@sistema/component-library": "*"
+     }
+   }
+   ```
+
+   Necesario explícitamente — npm workspaces solo crea el symlink para las
+   dependencias que cada paquete declara, no automáticamente por vivir en
+   el mismo repo.
+
+2. Añade `transpilePackages` en su `next.config.ts`, porque el paquete se
+   consume como código fuente TypeScript sin compilar, no como un `dist/`:
+
+   ```typescript
+   import type { NextConfig } from "next";
+
+   const nextConfig: NextConfig = {
+     transpilePackages: ["@sistema/component-library"],
+   };
+
+   export default nextConfig;
+   ```
+
+3. Importa directamente desde el paquete, sin conocer su ruta interna:
+
+   ```typescript
+   import { TextReveal, ParallaxImage, ProductReveal } from "@sistema/component-library";
+   import type { TextRevealProps } from "@sistema/component-library";
+   ```
