@@ -50,7 +50,7 @@ const DEFAULT_PIN_DURATION = 500;
 function resolveProductRevealMode(mode: ProductRevealMode): "css3d" {
   if (mode === "sequence") {
     console.warn(
-      '[ProductReveal] mode="sequence" is not implemented yet — falling back to "css3d".'
+      '[ProductReveal] mode="sequence" is not implemented yet — falling back to "css3d".',
     );
     return "css3d";
   }
@@ -77,7 +77,7 @@ export function ProductReveal({
     if (!section || !object) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -122,7 +122,7 @@ export function ProductReveal({
           scrub: 0.5,
           pin: !isMobile,
         },
-      }
+      },
     );
 
     return () => {
@@ -134,7 +134,10 @@ export function ProductReveal({
   return (
     <section
       ref={sectionRef}
-      className={["flex min-h-screen items-center justify-center overflow-hidden", className]
+      className={[
+        "flex min-h-screen items-center justify-center overflow-hidden",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
       style={{ perspective: "1200px", transformStyle: "preserve-3d" }}

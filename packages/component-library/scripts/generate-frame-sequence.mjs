@@ -28,7 +28,9 @@ async function main() {
   const page = await browser.newPage();
   await page.setViewport({ width: CANVAS_SIZE, height: CANVAS_SIZE });
 
-  console.log(`Generating ${FRAME_COUNT} frames from ${BASE_URL}/render-sequence ...`);
+  console.log(
+    `Generating ${FRAME_COUNT} frames from ${BASE_URL}/render-sequence ...`,
+  );
 
   for (let i = 0; i < FRAME_COUNT; i++) {
     const angle = i * DEGREES_PER_FRAME;

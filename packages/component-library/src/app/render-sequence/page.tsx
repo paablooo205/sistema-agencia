@@ -24,7 +24,10 @@ function readAngleFromUrl(): number {
 }
 
 function readModelSrcFromUrl(): string {
-  return new URLSearchParams(window.location.search).get("model") ?? DEFAULT_MODEL_SRC;
+  return (
+    new URLSearchParams(window.location.search).get("model") ??
+    DEFAULT_MODEL_SRC
+  );
 }
 
 function Model({ modelSrc, angleDeg }: { modelSrc: string; angleDeg: number }) {
@@ -52,7 +55,8 @@ function Model({ modelSrc, angleDeg }: { modelSrc: string; angleDeg: number }) {
     // pose — signalling immediately would risk capturing a stale frame.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        (window as typeof window & { __renderReady?: boolean }).__renderReady = true;
+        (window as typeof window & { __renderReady?: boolean }).__renderReady =
+          true;
       });
     });
   }, [scene, angleDeg]);
@@ -92,7 +96,12 @@ export default function RenderSequencePage() {
         <ambientLight intensity={0.4} />
         <directionalLight position={[3, 5, 2]} intensity={1} />
         <Environment resolution={256}>
-          <Lightformer intensity={2} color="white" position={[0, 5, -8]} scale={[10, 10, 1]} />
+          <Lightformer
+            intensity={2}
+            color="white"
+            position={[0, 5, -8]}
+            scale={[10, 10, 1]}
+          />
           <Lightformer
             intensity={1.5}
             color="white"

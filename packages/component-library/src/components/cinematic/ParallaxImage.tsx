@@ -48,7 +48,7 @@ export function ParallaxImage({
     img.style.height = `calc(100% + ${travel}px)`;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -64,7 +64,7 @@ export function ParallaxImage({
           end: "bottom top",
           scrub: true,
         },
-      }
+      },
     );
 
     return () => {

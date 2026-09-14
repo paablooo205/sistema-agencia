@@ -16,14 +16,17 @@ export default function CinematicSceneDemoPage() {
       </section>
       <CinematicScene className="bg-neutral-100 text-neutral-900">
         <p className="text-xl">
-          enter=&quot;none&quot; (default) — sin animación, aparece igual que cualquier
-          sección.
+          enter=&quot;none&quot; (default) — sin animación, aparece igual que
+          cualquier sección.
         </p>
       </CinematicScene>
-      <CinematicScene enter="fade-up" className="bg-neutral-900 text-neutral-50">
+      <CinematicScene
+        enter="fade-up"
+        className="bg-neutral-900 text-neutral-50"
+      >
         <p className="text-xl">
-          enter=&quot;fade-up&quot; — opt-in explícito, dispara una vez al entrar en
-          viewport.
+          enter=&quot;fade-up&quot; — opt-in explícito, dispara una vez al
+          entrar en viewport.
         </p>
       </CinematicScene>
       <section className="min-h-screen" />

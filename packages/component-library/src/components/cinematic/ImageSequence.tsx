@@ -35,14 +35,20 @@ function frameUrl(
   prefix: string,
   index: number,
   pad: number,
-  ext: string
+  ext: string,
 ) {
   return `${basePath}/${prefix}${String(index).padStart(pad, "0")}.${ext}`;
 }
 
-function drawFrame(canvas: HTMLCanvasElement | null, img: HTMLImageElement | undefined) {
+function drawFrame(
+  canvas: HTMLCanvasElement | null,
+  img: HTMLImageElement | undefined,
+) {
   if (!canvas || !img || !img.complete || img.naturalWidth === 0) return;
-  if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+  if (
+    canvas.width !== img.naturalWidth ||
+    canvas.height !== img.naturalHeight
+  ) {
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
   }
@@ -102,7 +108,7 @@ export function ImageSequence({
     if (!section) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) {
       const index = Math.min(Math.max(staticFrameIndex, 0), frameCount - 1);
@@ -112,15 +118,23 @@ export function ImageSequence({
 
     const isMobile = window.innerWidth < mobileBreakpoint;
     const resolvedPinDuration =
-      isMobile && typeof pinDuration === "number" ? pinDuration / 2 : pinDuration;
+      isMobile && typeof pinDuration === "number"
+        ? pinDuration / 2
+        : pinDuration;
     const resolvedEnd =
-      typeof resolvedPinDuration === "number" ? `+=${resolvedPinDuration}` : resolvedPinDuration;
+      typeof resolvedPinDuration === "number"
+        ? `+=${resolvedPinDuration}`
+        : resolvedPinDuration;
 
     const state = { frame: 0 };
     const tween = gsap.to(state, {
       frame: frameCount - 1,
       ease: "none",
-      onUpdate: () => drawFrame(canvasRef.current, imagesRef.current[Math.round(state.frame)]),
+      onUpdate: () =>
+        drawFrame(
+          canvasRef.current,
+          imagesRef.current[Math.round(state.frame)],
+        ),
       scrollTrigger: {
         trigger: section,
         start: "top top",
@@ -139,12 +153,21 @@ export function ImageSequence({
       tween.scrollTrigger?.kill();
       tween.kill();
     };
-  }, [loadedCount, frameCount, pinDuration, mobileBreakpoint, staticFrameIndex]);
+  }, [
+    loadedCount,
+    frameCount,
+    pinDuration,
+    mobileBreakpoint,
+    staticFrameIndex,
+  ]);
 
   return (
     <section
       ref={sectionRef}
-      className={["flex min-h-screen items-center justify-center overflow-hidden", className]
+      className={[
+        "flex min-h-screen items-center justify-center overflow-hidden",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
