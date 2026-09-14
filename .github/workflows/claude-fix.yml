@@ -5,9 +5,9 @@ on:
     types: [opened, synchronize]
 
 permissions:
+  id-token: write
   contents: write
   pull-requests: write
-  issues: write
 
 jobs:
   claude-fix:
@@ -23,9 +23,9 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: "--max-turns 15"
           prompt: |
-            El código real vive en component-library/ (el package.json de
-            la raíz de este repo, si existiera, no es el del proyecto).
-            Dentro de component-library/:
+            El código real vive en packages/component-library/ (el
+            package.json de la raíz de este repo es el del workspace de
+            npm, no el del proyecto). Dentro de packages/component-library/:
 
             1. Ejecuta el build (`npm run build`) y, si package.json
                define un script de test, ejecútalo también.
