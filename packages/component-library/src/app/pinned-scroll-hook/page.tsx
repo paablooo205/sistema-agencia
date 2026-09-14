@@ -54,8 +54,8 @@ export default function PinnedScrollHookDemoPage() {
       <section className="flex min-h-screen flex-col items-center justify-center gap-4">
         <h1 className="text-2xl font-semibold">usePinnedScroll</h1>
         <p className="text-lg">
-          Sección construida desde cero con el hook, no un componente
-          existente — scroll para pinear y ver el cuadrado rotar/escalar ↓
+          Sección construida desde cero con el hook, no un componente existente
+          — scroll para pinear y ver el cuadrado rotar/escalar ↓
         </p>
       </section>
       <PinnedBox />
