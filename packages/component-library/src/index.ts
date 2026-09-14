@@ -35,3 +35,14 @@ export type {
   BrandRevealProps,
   BrandRevealTag,
 } from "./components/cinematic/BrandReveal";
+
+export { Footer } from "./components/cinematic/Footer";
+export type {
+  FooterProps,
+  FooterNavColumn,
+  FooterContactPerson,
+  FooterSocialLink,
+  FooterLegalLink,
+  FooterBrandMarkTreatment,
+  FooterEnter,
+} from "./components/cinematic/Footer";
