@@ -1,0 +1,42 @@
+name: Claude auto-fix on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  claude-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: "--max-turns 15"
+          prompt: |
+            El código real vive en packages/component-library/ (el
+            package.json de la raíz de este repo es el del workspace de
+            npm, no el del proyecto). Dentro de packages/component-library/:
+
+            1. Ejecuta el build (`npm run build`) y, si package.json
+               define un script de test, ejecútalo también.
+            2. Si algo falla, diagnostica la causa raíz y corrígela
+               siguiendo las reglas de CLAUDE.md en la raíz del repo
+               (stack permitido, reglas anti-AI-slop, SEO/semántica,
+               filosofía de scroll y animación) — no apliques
+               workarounds que las contradigan.
+            3. Deja el resultado commiteado en esta misma rama del PR,
+               listo para revisión humana.
+
+            Restricción absoluta: nunca hagas merge a main ni push a
+            main bajo ningún concepto. Todo el trabajo se queda en la
+            rama de este PR, para que una persona lo revise y decida.

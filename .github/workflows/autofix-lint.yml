@@ -1,0 +1,41 @@
+name: Autofix lint and formatting
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      # Only pushes back cleanly for PRs from branches in this repo — a
+      # fork's GITHUB_TOKEN has no write access to push to its head ref.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # npm ci runs at the repo root — npm workspaces keeps a single
+      # lockfile there, not one per package (see root README.md).
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint --fix
+        working-directory: packages/component-library
+        run: npm run lint -- --fix
+
+      - name: Prettier --write
+        working-directory: packages/component-library
+        run: npx prettier --write .
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: autofix lint and formatting"
+          file_pattern: "packages/component-library/**"

@@ -97,6 +97,6 @@ y las tres bibliotecas de abajo desde cualquier carpeta de cliente.
   filosofía de diseño y técnica.
 - `docs/spec-sistema-agentes.md` — especificación de agentes, inputs,
   outputs, permisos y coordinación.
-- `component-library/README.md` — biblioteca de componentes cinematográficos.
+- `packages/component-library/README.md` — biblioteca de componentes cinematográficos.
 - `motion-recipes/README.md` — biblioteca de recetas de animación.
 - `reference-library/README.md` — biblioteca de referencias visuales/técnicas.
