@@ -46,3 +46,11 @@ export type {
   FooterBrandMarkTreatment,
   FooterEnter,
 } from "./components/cinematic/Footer";
+
+export { usePinnedScroll } from "./lib/usePinnedScroll";
+export type {
+  UsePinnedScrollOptions,
+  UsePinnedScrollContext,
+  PinnedScrollBuilder,
+  PinnedScrollHandle,
+} from "./lib/usePinnedScroll";
