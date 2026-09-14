@@ -37,11 +37,12 @@ export function TextReveal({
     const container = containerRef.current;
     if (!container) return;
 
-    const wordEls = container.querySelectorAll<HTMLElement>("[data-reveal-word]");
+    const wordEls =
+      container.querySelectorAll<HTMLElement>("[data-reveal-word]");
     if (wordEls.length === 0) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -81,8 +82,8 @@ export function TextReveal({
         "span",
         { key: i, "data-reveal-word": true, className: wordClassName },
         word,
-        i < words.length - 1 ? " " : ""
-      )
-    )
+        i < words.length - 1 ? " " : "",
+      ),
+    ),
   );
 }

@@ -166,12 +166,22 @@ function Model({
     const footer = footerRef.current;
     if (!group || !section || !wordContainer || !footer) return;
 
-    const letterEls = wordContainer.querySelectorAll<HTMLElement>("[data-reveal-letter]");
+    const letterEls = wordContainer.querySelectorAll<HTMLElement>(
+      "[data-reveal-letter]",
+    );
     const shelfEl = footer.querySelector<HTMLElement>("[data-footer-shelf]");
-    const navEls = footer.querySelectorAll<HTMLElement>("[data-footer-nav-item]");
-    const socialEls = footer.querySelectorAll<HTMLElement>("[data-footer-social-item]");
-    const contactEls = footer.querySelectorAll<HTMLElement>("[data-footer-contact-line]");
-    const copyrightEls = footer.querySelectorAll<HTMLElement>("[data-footer-copyright]");
+    const navEls = footer.querySelectorAll<HTMLElement>(
+      "[data-footer-nav-item]",
+    );
+    const socialEls = footer.querySelectorAll<HTMLElement>(
+      "[data-footer-social-item]",
+    );
+    const contactEls = footer.querySelectorAll<HTMLElement>(
+      "[data-footer-contact-line]",
+    );
+    const copyrightEls = footer.querySelectorAll<HTMLElement>(
+      "[data-footer-copyright]",
+    );
 
     // Base tilt — fixed once on mount, on a different axis than the
     // scroll-driven Y rotation below. Never touched again.
@@ -180,7 +190,7 @@ function Model({
     else group.rotation.z = tiltRad;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) {
       // Static, legible presentation instead of the animated sequence:
@@ -207,9 +217,13 @@ function Model({
     // moving) section has already scrolled out of view — same reasoning
     // and pattern as ProductReveal.
     const resolvedPinDuration =
-      isMobile && typeof pinDuration === "number" ? pinDuration / 2 : pinDuration;
+      isMobile && typeof pinDuration === "number"
+        ? pinDuration / 2
+        : pinDuration;
     const resolvedEnd =
-      typeof resolvedPinDuration === "number" ? `+=${resolvedPinDuration}` : resolvedPinDuration;
+      typeof resolvedPinDuration === "number"
+        ? `+=${resolvedPinDuration}`
+        : resolvedPinDuration;
 
     // gsap.to(group, {"rotation.y": ...}) does NOT work — dot-notation
     // strings aren't valid nested-property syntax for a plain target in
@@ -244,24 +258,28 @@ function Model({
       },
     });
 
-    tl.to(group.rotation, { y: `+=${Math.PI * 2}`, ease: "none", duration: 0.55 }, 0)
+    tl.to(
+      group.rotation,
+      { y: `+=${Math.PI * 2}`, ease: "none", duration: 0.55 },
+      0,
+    )
       .fromTo(
         group.scale,
         { x: startScale, y: startScale, z: startScale },
         { x: endScale, y: endScale, z: endScale, ease: "none", duration: 0.55 },
-        0
+        0,
       )
       .fromTo(
         group.position,
         { x: -cornerOffsetX, y: -cornerOffsetY },
         { x: cornerOffsetX, y: cornerOffsetY, ease: "none", duration: 0.55 },
-        0
+        0,
       )
       .fromTo(
         section,
         { backgroundColor: "rgba(0, 0, 0, 0)" },
         { backgroundColor: backgroundTintColor, ease: "none", duration: 0.4 },
-        0
+        0,
       );
 
     if (letterEls.length > 0) {
@@ -272,8 +290,15 @@ function Model({
       gsap.set(letterEls, { opacity: 0, y: 40, scale: 0.4 });
       tl.to(
         letterEls,
-        { opacity: 1, y: 0, scale: 1, ease: "back.out(1.8)", stagger: 0.06, duration: 0.25 },
-        0.35
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          ease: "back.out(1.8)",
+          stagger: 0.06,
+          duration: 0.25,
+        },
+        0.35,
       );
     }
 
@@ -287,27 +312,53 @@ function Model({
     }
     if (navEls.length > 0) {
       gsap.set(navEls, { opacity: 0, x: -30 });
-      tl.to(navEls, { opacity: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05, duration: 0.2 }, 0.62);
+      tl.to(
+        navEls,
+        {
+          opacity: 1,
+          x: 0,
+          ease: "back.out(1.5)",
+          stagger: 0.05,
+          duration: 0.2,
+        },
+        0.62,
+      );
     }
     if (contactEls.length > 0) {
       gsap.set(contactEls, { opacity: 0, y: 24 });
       tl.to(
         contactEls,
-        { opacity: 1, y: 0, ease: "back.out(1.5)", stagger: 0.05, duration: 0.2 },
-        0.65
+        {
+          opacity: 1,
+          y: 0,
+          ease: "back.out(1.5)",
+          stagger: 0.05,
+          duration: 0.2,
+        },
+        0.65,
       );
     }
     if (socialEls.length > 0) {
       gsap.set(socialEls, { opacity: 0, x: 30 });
       tl.to(
         socialEls,
-        { opacity: 1, x: 0, ease: "back.out(1.5)", stagger: 0.05, duration: 0.2 },
-        0.68
+        {
+          opacity: 1,
+          x: 0,
+          ease: "back.out(1.5)",
+          stagger: 0.05,
+          duration: 0.2,
+        },
+        0.68,
       );
     }
     if (copyrightEls.length > 0) {
       gsap.set(copyrightEls, { opacity: 0, y: 16 });
-      tl.to(copyrightEls, { opacity: 1, y: 0, ease: "power2.out", duration: 0.2 }, 0.76);
+      tl.to(
+        copyrightEls,
+        { opacity: 1, y: 0, ease: "power2.out", duration: 0.2 },
+        0.76,
+      );
     }
 
     return () => {
@@ -393,7 +444,10 @@ export function Product3DCloseout({
   return (
     <section
       ref={sectionRef}
-      className={["relative flex min-h-screen items-center justify-center overflow-hidden", className]
+      className={[
+        "relative flex min-h-screen items-center justify-center overflow-hidden",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
@@ -405,7 +459,10 @@ export function Product3DCloseout({
         ref={wordContainerRef}
         className="pointer-events-none absolute inset-0 z-0 flex items-start justify-start pl-[6vw] pt-[28vh]"
       >
-        <p className={`${rubikBubbles.className} flex text-8xl sm:text-9xl md:text-[11rem]`} style={{ color: revealWordColor }}>
+        <p
+          className={`${rubikBubbles.className} flex text-8xl sm:text-9xl md:text-[11rem]`}
+          style={{ color: revealWordColor }}
+        >
           {letters.map((letter, i) => (
             <span key={i} data-reveal-letter className="inline-block">
               {letter}
@@ -434,10 +491,33 @@ export function Product3DCloseout({
             fails outright with no network access; this has no such
             dependency. */}
         <Environment resolution={256}>
-          <Lightformer intensity={2} color="white" position={[0, 5, -8]} scale={[10, 10, 1]} />
-          <Lightformer intensity={1.5} color="white" position={[-6, 1, -1]} rotation={[0, Math.PI / 2, 0]} scale={[10, 2, 1]} />
-          <Lightformer intensity={1.5} color="white" position={[6, 1, -1]} rotation={[0, -Math.PI / 2, 0]} scale={[10, 2, 1]} />
-          <Lightformer intensity={1} color="white" position={[0, -5, 1]} rotation={[Math.PI / 2, 0, 0]} scale={[10, 10, 1]} />
+          <Lightformer
+            intensity={2}
+            color="white"
+            position={[0, 5, -8]}
+            scale={[10, 10, 1]}
+          />
+          <Lightformer
+            intensity={1.5}
+            color="white"
+            position={[-6, 1, -1]}
+            rotation={[0, Math.PI / 2, 0]}
+            scale={[10, 2, 1]}
+          />
+          <Lightformer
+            intensity={1.5}
+            color="white"
+            position={[6, 1, -1]}
+            rotation={[0, -Math.PI / 2, 0]}
+            scale={[10, 2, 1]}
+          />
+          <Lightformer
+            intensity={1}
+            color="white"
+            position={[0, -5, 1]}
+            rotation={[Math.PI / 2, 0, 0]}
+            scale={[10, 10, 1]}
+          />
         </Environment>
         <Suspense fallback={null}>
           <Model
@@ -477,7 +557,9 @@ export function Product3DCloseout({
             >
               <path d={WAVE_PATH} fill="currentColor" />
             </svg>
-            <div className={`${inter.className} bg-black/25 px-6 pb-6 pt-8 backdrop-blur-[2px] sm:px-10 sm:pb-8 sm:pt-10`}>
+            <div
+              className={`${inter.className} bg-black/25 px-6 pb-6 pt-8 backdrop-blur-[2px] sm:px-10 sm:pb-8 sm:pt-10`}
+            >
               <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 sm:grid-cols-3">
                 {footerNavLinks.length > 0 && (
                   <div>
@@ -505,7 +587,11 @@ export function Product3DCloseout({
                     </p>
                     <ul className="space-y-2">
                       {footerContactLines.map((line) => (
-                        <li key={line} data-footer-contact-line className="text-[15px] text-white/80">
+                        <li
+                          key={line}
+                          data-footer-contact-line
+                          className="text-[15px] text-white/80"
+                        >
                           {line}
                         </li>
                       ))}
