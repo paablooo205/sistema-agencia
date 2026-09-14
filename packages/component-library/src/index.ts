@@ -35,3 +35,22 @@ export type {
   BrandRevealProps,
   BrandRevealTag,
 } from "./components/cinematic/BrandReveal";
+
+export { Footer } from "./components/cinematic/Footer";
+export type {
+  FooterProps,
+  FooterNavColumn,
+  FooterContactPerson,
+  FooterSocialLink,
+  FooterLegalLink,
+  FooterBrandMarkTreatment,
+  FooterEnter,
+} from "./components/cinematic/Footer";
+
+export { usePinnedScroll } from "./lib/usePinnedScroll";
+export type {
+  UsePinnedScrollOptions,
+  UsePinnedScrollContext,
+  PinnedScrollBuilder,
+  PinnedScrollHandle,
+} from "./lib/usePinnedScroll";
