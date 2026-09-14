@@ -1,10 +1,8 @@
-# ADR: cómo un proyecto de cliente consume component-library — sin resolver
+# ADR: cómo un proyecto de cliente consume component-library — resuelto
 
 Fecha: 2026-08-30
-Estado: **Pendiente** — parche temporal aplicado solo para completar la
-prueba end-to-end `_prueba-1`. No es la decisión de arquitectura
-definitiva. La decisión real se toma como tarea propia, deliberada, antes
-de crear el primer cliente real (no ficticio).
+Estado: **Resuelto** (2026-09-14) — Opción 2 (npm workspaces) implementada
+en `docs/superpowers/plans/2026-09-14-component-library-monorepo-migration.md`.
 
 ## Contexto
 
@@ -87,7 +85,40 @@ como hueco, no como precedente a repetir.
 
 ## Estado
 
-Sin resolver. Bloquea: que el patrón usado en `_prueba-1` se convierta en
-la forma "normal" de trabajar sin más discusión. No bloquea: seguir
-completando la prueba `_prueba-1` con el parche ya aplicado, puesto que
-es una prueba de pipeline, no un cliente real en producción.
+Resuelto — ver "Resolución" abajo.
+
+## Resolución (2026-09-14)
+
+Se eligió la **Opción 2 (npm workspaces)** de las tres barajadas arriba.
+
+- `_sistema/` es ahora un monorepo con npm workspaces
+  (`"workspaces": ["packages/*", "apps/clientes/*"]` en el `package.json`
+  raíz).
+- `component-library/` se movió a `packages/component-library/` (con
+  `git mv`, historial preservado) y ahora se publica dentro del workspace
+  como `@sistema/component-library`, con un barrel `src/index.ts` y
+  `exports` en su `package.json`.
+- `clientes/` se movió a `apps/clientes/` por el mismo criterio (aunque
+  en la práctica nunca había estado trackeado por git, así que fue un
+  movimiento simple, no un rename con historial que preservar).
+- Un proyecto de cliente nuevo declara `"@sistema/component-library": "*"`
+  como dependencia y `transpilePackages: ["@sistema/component-library"]`
+  en su `next.config.ts` — desde ahí, `import { TextReveal } from
+  "@sistema/component-library"` es un import real, no una copia.
+- El parche de `_prueba-1` (componentes duplicados por copia) queda
+  confirmado como no repetible: el primer cliente real usa el import de
+  workspace, no una copia.
+- `motion-recipes/` y `reference-library/` no se movieron — no son
+  paquetes de código, y el problema que resolvía este ADR era
+  específicamente la distribución de `component-library/`.
+
+Verificado tras la migración: `npm install` único desde la raíz, build y
+lint del paquete sin errores, y las 6 demo pages (`/product-reveal`,
+`/product-3d-closeout`, `/cinematic-scene`, `/parallax-image`,
+`/text-reveal`, `/image-sequence`) respondiendo 200 — incluyendo los
+assets estáticos críticos (`public/sequences/botella-360/` con sus 120
+frames, `public/models/botella_fanta.glb`) tras el movimiento de
+`public/`.
+
+Detalle completo de la migración (tareas, comandos, verificación) en
+`docs/superpowers/plans/2026-09-14-component-library-monorepo-migration.md`.
