@@ -169,9 +169,7 @@ function Model({
       const letterEls = wordContainer.querySelectorAll<HTMLElement>(
         "[data-reveal-letter]",
       );
-      const shelfEl = footer.querySelector<HTMLElement>(
-        "[data-footer-shelf]",
-      );
+      const shelfEl = footer.querySelector<HTMLElement>("[data-footer-shelf]");
       const navEls = footer.querySelectorAll<HTMLElement>(
         "[data-footer-nav-item]",
       );
@@ -236,109 +234,119 @@ function Model({
       const tl = gsap.timeline({ scrollTrigger: ctx.scrollTrigger });
 
       tl.to(
-      group.rotation,
-      { y: `+=${Math.PI * 2}`, ease: "none", duration: 0.55 },
-      0,
-    )
-      .fromTo(
-        group.scale,
-        { x: startScale, y: startScale, z: startScale },
-        { x: endScale, y: endScale, z: endScale, ease: "none", duration: 0.55 },
+        group.rotation,
+        { y: `+=${Math.PI * 2}`, ease: "none", duration: 0.55 },
         0,
       )
-      .fromTo(
-        group.position,
-        { x: -cornerOffsetX, y: -cornerOffsetY },
-        { x: cornerOffsetX, y: cornerOffsetY, ease: "none", duration: 0.55 },
-        0,
-      )
-      .fromTo(
-        section,
-        { backgroundColor: "rgba(0, 0, 0, 0)" },
-        { backgroundColor: backgroundTintColor, ease: "none", duration: 0.4 },
-        0,
-      );
+        .fromTo(
+          group.scale,
+          { x: startScale, y: startScale, z: startScale },
+          {
+            x: endScale,
+            y: endScale,
+            z: endScale,
+            ease: "none",
+            duration: 0.55,
+          },
+          0,
+        )
+        .fromTo(
+          group.position,
+          { x: -cornerOffsetX, y: -cornerOffsetY },
+          { x: cornerOffsetX, y: cornerOffsetY, ease: "none", duration: 0.55 },
+          0,
+        )
+        .fromTo(
+          section,
+          { backgroundColor: "rgba(0, 0, 0, 0)" },
+          { backgroundColor: backgroundTintColor, ease: "none", duration: 0.4 },
+          0,
+        );
 
-    if (letterEls.length > 0) {
-      // Each letter floats up like a balloon (rises + fades in + pops
-      // past 100% scale before settling) instead of just fading in place
-      // — "back.out" gives the slight overshoot that reads as buoyant
-      // rather than mechanical.
-      gsap.set(letterEls, { opacity: 0, y: 40, scale: 0.4 });
-      tl.to(
-        letterEls,
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          ease: "back.out(1.8)",
-          stagger: 0.06,
-          duration: 0.25,
-        },
-        0.35,
-      );
-    }
+      if (letterEls.length > 0) {
+        // Each letter floats up like a balloon (rises + fades in + pops
+        // past 100% scale before settling) instead of just fading in place
+        // — "back.out" gives the slight overshoot that reads as buoyant
+        // rather than mechanical.
+        gsap.set(letterEls, { opacity: 0, y: 40, scale: 0.4 });
+        tl.to(
+          letterEls,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "back.out(1.8)",
+            stagger: 0.06,
+            duration: 0.25,
+          },
+          0.35,
+        );
+      }
 
-    if (shelfEl) {
-      // The shelf (scrim panel + wave edge) rises up from below the
-      // fold, then each content column floats in from whichever edge
-      // it's closest to — same buoyant language as the word letters, so
-      // the whole close reads as one consistent motion vocabulary.
-      gsap.set(shelfEl, { yPercent: 100 });
-      tl.to(shelfEl, { yPercent: 0, ease: "power3.out", duration: 0.18 }, 0.5);
-    }
-    if (navEls.length > 0) {
-      gsap.set(navEls, { opacity: 0, x: -30 });
-      tl.to(
-        navEls,
-        {
-          opacity: 1,
-          x: 0,
-          ease: "back.out(1.5)",
-          stagger: 0.05,
-          duration: 0.2,
-        },
-        0.62,
-      );
-    }
-    if (contactEls.length > 0) {
-      gsap.set(contactEls, { opacity: 0, y: 24 });
-      tl.to(
-        contactEls,
-        {
-          opacity: 1,
-          y: 0,
-          ease: "back.out(1.5)",
-          stagger: 0.05,
-          duration: 0.2,
-        },
-        0.65,
-      );
-    }
-    if (socialEls.length > 0) {
-      gsap.set(socialEls, { opacity: 0, x: 30 });
-      tl.to(
-        socialEls,
-        {
-          opacity: 1,
-          x: 0,
-          ease: "back.out(1.5)",
-          stagger: 0.05,
-          duration: 0.2,
-        },
-        0.68,
-      );
-    }
-    if (copyrightEls.length > 0) {
-      gsap.set(copyrightEls, { opacity: 0, y: 16 });
-      tl.to(
-        copyrightEls,
-        { opacity: 1, y: 0, ease: "power2.out", duration: 0.2 },
-        0.76,
-      );
-    }
+      if (shelfEl) {
+        // The shelf (scrim panel + wave edge) rises up from below the
+        // fold, then each content column floats in from whichever edge
+        // it's closest to — same buoyant language as the word letters, so
+        // the whole close reads as one consistent motion vocabulary.
+        gsap.set(shelfEl, { yPercent: 100 });
+        tl.to(
+          shelfEl,
+          { yPercent: 0, ease: "power3.out", duration: 0.18 },
+          0.5,
+        );
+      }
+      if (navEls.length > 0) {
+        gsap.set(navEls, { opacity: 0, x: -30 });
+        tl.to(
+          navEls,
+          {
+            opacity: 1,
+            x: 0,
+            ease: "back.out(1.5)",
+            stagger: 0.05,
+            duration: 0.2,
+          },
+          0.62,
+        );
+      }
+      if (contactEls.length > 0) {
+        gsap.set(contactEls, { opacity: 0, y: 24 });
+        tl.to(
+          contactEls,
+          {
+            opacity: 1,
+            y: 0,
+            ease: "back.out(1.5)",
+            stagger: 0.05,
+            duration: 0.2,
+          },
+          0.65,
+        );
+      }
+      if (socialEls.length > 0) {
+        gsap.set(socialEls, { opacity: 0, x: 30 });
+        tl.to(
+          socialEls,
+          {
+            opacity: 1,
+            x: 0,
+            ease: "back.out(1.5)",
+            stagger: 0.05,
+            duration: 0.2,
+          },
+          0.68,
+        );
+      }
+      if (copyrightEls.length > 0) {
+        gsap.set(copyrightEls, { opacity: 0, y: 16 });
+        tl.to(
+          copyrightEls,
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.2 },
+          0.76,
+        );
+      }
 
-    return tl;
+      return tl;
     },
   );
 
