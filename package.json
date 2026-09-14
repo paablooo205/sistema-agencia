@@ -1,0 +1,8 @@
+{
+  "name": "sistema",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/clientes/*"
+  ]
+}

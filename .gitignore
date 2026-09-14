@@ -1,4 +1,5 @@
 .superpowers/
+node_modules/
 
 # Capturas de referencia visual — material de inspiración crudo, se queda
 # en disco local para consulta pero no en el repo (peso, no es contenido
