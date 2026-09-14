@@ -62,3 +62,5 @@ npm run dev
 
 Abrir `http://localhost:3000` — el índice enlaza a la demo de cada
 componente implementado.
+
+<!-- Smoke test trivial para validar autofix-lint.yml / claude-fix.yml en un PR real. -->
