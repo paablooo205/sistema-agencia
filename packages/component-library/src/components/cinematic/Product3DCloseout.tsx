@@ -5,10 +5,8 @@ import { Canvas } from "@react-three/fiber";
 import { Environment, Lightformer, useGLTF } from "@react-three/drei";
 import { Inter, Rubik_Bubbles } from "next/font/google";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
-
-gsap.registerPlugin(ScrollTrigger);
+import { usePinnedScroll } from "@/lib/usePinnedScroll";
 
 // "Fat Bubble" isn't a real Google Font (checked) — Rubik Bubbles is the
 // closest real match: chunky, rounded, balloon-like display letterforms.
@@ -159,106 +157,85 @@ function Model({
     materialsRef.current = materials;
   }, [scene, materialOverride, color]);
 
-  useEffect(() => {
-    const group = groupRef.current;
-    const section = sectionRef.current;
-    const wordContainer = wordContainerRef.current;
-    const footer = footerRef.current;
-    if (!group || !section || !wordContainer || !footer) return;
+  usePinnedScroll(
+    { triggerRef: sectionRef, pinDuration, mobileBreakpoint },
+    (ctx) => {
+      const group = groupRef.current;
+      const section = sectionRef.current;
+      const wordContainer = wordContainerRef.current;
+      const footer = footerRef.current;
+      if (!group || !section || !wordContainer || !footer) return null;
 
-    const letterEls = wordContainer.querySelectorAll<HTMLElement>(
-      "[data-reveal-letter]",
-    );
-    const shelfEl = footer.querySelector<HTMLElement>("[data-footer-shelf]");
-    const navEls = footer.querySelectorAll<HTMLElement>(
-      "[data-footer-nav-item]",
-    );
-    const socialEls = footer.querySelectorAll<HTMLElement>(
-      "[data-footer-social-item]",
-    );
-    const contactEls = footer.querySelectorAll<HTMLElement>(
-      "[data-footer-contact-line]",
-    );
-    const copyrightEls = footer.querySelectorAll<HTMLElement>(
-      "[data-footer-copyright]",
-    );
+      const letterEls = wordContainer.querySelectorAll<HTMLElement>(
+        "[data-reveal-letter]",
+      );
+      const shelfEl = footer.querySelector<HTMLElement>(
+        "[data-footer-shelf]",
+      );
+      const navEls = footer.querySelectorAll<HTMLElement>(
+        "[data-footer-nav-item]",
+      );
+      const socialEls = footer.querySelectorAll<HTMLElement>(
+        "[data-footer-social-item]",
+      );
+      const contactEls = footer.querySelectorAll<HTMLElement>(
+        "[data-footer-contact-line]",
+      );
+      const copyrightEls = footer.querySelectorAll<HTMLElement>(
+        "[data-footer-copyright]",
+      );
 
-    // Base tilt — fixed once on mount, on a different axis than the
-    // scroll-driven Y rotation below. Never touched again.
-    const tiltRad = (tiltDeg * Math.PI) / 180;
-    if (tiltAxis === "x") group.rotation.x = tiltRad;
-    else group.rotation.z = tiltRad;
+      // Base tilt — fixed once on mount, on a different axis than the
+      // scroll-driven Y rotation below. Never touched again.
+      const tiltRad = (tiltDeg * Math.PI) / 180;
+      if (tiltAxis === "x") group.rotation.x = tiltRad;
+      else group.rotation.z = tiltRad;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReducedMotion) {
-      // Static, legible presentation instead of the animated sequence:
-      // object at a reasonable fixed size (not DEFAULT_START_SCALE, which
-      // is deliberately too small/corner-cropped to stand alone), word
-      // and footer fully visible immediately, background already at its
-      // final tint — the settled end state shown at once, not the motion
-      // that gets there.
-      group.scale.setScalar(REDUCED_MOTION_SCALE);
-      section.style.backgroundColor = backgroundTintColor;
-      gsap.set(letterEls, { opacity: 1, y: 0, scale: 1 });
-      if (shelfEl) gsap.set(shelfEl, { yPercent: 0 });
-      gsap.set([...navEls, ...socialEls, ...contactEls, ...copyrightEls], {
-        opacity: 1,
-        x: 0,
-        y: 0,
-      });
-      return;
-    }
+      if (ctx.prefersReducedMotion) {
+        // Static, legible presentation instead of the animated sequence:
+        // object at a reasonable fixed size (not DEFAULT_START_SCALE, which
+        // is deliberately too small/corner-cropped to stand alone), word
+        // and footer fully visible immediately, background already at its
+        // final tint — the settled end state shown at once, not the motion
+        // that gets there.
+        group.scale.setScalar(REDUCED_MOTION_SCALE);
+        section.style.backgroundColor = backgroundTintColor;
+        gsap.set(letterEls, { opacity: 1, y: 0, scale: 1 });
+        if (shelfEl) gsap.set(shelfEl, { yPercent: 0 });
+        gsap.set([...navEls, ...socialEls, ...contactEls, ...copyrightEls], {
+          opacity: 1,
+          x: 0,
+          y: 0,
+        });
+        return null;
+      }
 
-    const isMobile = window.innerWidth < mobileBreakpoint;
-    // Mobile doesn't pin, so a pinDuration sized for a *held* sequence
-    // risks the animation still being mid-way when the (unpinned,
-    // moving) section has already scrolled out of view — same reasoning
-    // and pattern as ProductReveal.
-    const resolvedPinDuration =
-      isMobile && typeof pinDuration === "number"
-        ? pinDuration / 2
-        : pinDuration;
-    const resolvedEnd =
-      typeof resolvedPinDuration === "number"
-        ? `+=${resolvedPinDuration}`
-        : resolvedPinDuration;
+      // gsap.to(group, {"rotation.y": ...}) does NOT work — dot-notation
+      // strings aren't valid nested-property syntax for a plain target in
+      // GSAP (confirmed on the GSAP forums). Each property needs its real
+      // sub-object as the tween target — group.rotation, group.scale,
+      // group.position are three different Vector3/Euler instances, not
+      // properties of one flat object gsap.to() can reach by string path.
+      // A single timeline with one shared ScrollTrigger keeps everything —
+      // object, background, word, footer — perfectly in sync.
+      //
+      // Positions (fractions of the timeline, not seconds — scrub maps
+      // scroll progress onto these regardless of the absolute numbers):
+      //   0    -> 0.4   background floods to backgroundTintColor
+      //   0    -> 0.55  object rotates/grows/travels corner-to-corner —
+      //                 no fade-out afterwards, it stays put, rising out
+      //                 of the footer shelf as the object's final resting
+      //                 spot "to one side"
+      //   0.35 -> 0.6   word appears letter by letter, staggered
+      //   0.5  -> 0.68  footer shelf rises from the bottom edge, wave and
+      //                 all
+      //   0.62 -> 0.75  nav column floats in from the left
+      //   0.65 -> 0.78  contact column floats in from below
+      //   0.68 -> 0.81  social column floats in from the right
+      //   0.76 -> 0.86  copyright line settles in last
+      const tl = gsap.timeline({ scrollTrigger: ctx.scrollTrigger });
 
-    // gsap.to(group, {"rotation.y": ...}) does NOT work — dot-notation
-    // strings aren't valid nested-property syntax for a plain target in
-    // GSAP (confirmed on the GSAP forums). Each property needs its real
-    // sub-object as the tween target — group.rotation, group.scale,
-    // group.position are three different Vector3/Euler instances, not
-    // properties of one flat object gsap.to() can reach by string path.
-    // A single timeline with one shared ScrollTrigger keeps everything —
-    // object, background, word, footer — perfectly in sync.
-    //
-    // Positions (fractions of the timeline, not seconds — scrub maps
-    // scroll progress onto these regardless of the absolute numbers):
-    //   0    -> 0.4   background floods to backgroundTintColor
-    //   0    -> 0.55  object rotates/grows/travels corner-to-corner —
-    //                 no fade-out afterwards, it stays put, rising out
-    //                 of the footer shelf as the object's final resting
-    //                 spot "to one side"
-    //   0.35 -> 0.6   word appears letter by letter, staggered
-    //   0.5  -> 0.68  footer shelf rises from the bottom edge, wave and
-    //                 all
-    //   0.62 -> 0.75  nav column floats in from the left
-    //   0.65 -> 0.78  contact column floats in from below
-    //   0.68 -> 0.81  social column floats in from the right
-    //   0.76 -> 0.86  copyright line settles in last
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: resolvedEnd,
-        scrub: 0.5,
-        pin: !isMobile,
-      },
-    });
-
-    tl.to(
+      tl.to(
       group.rotation,
       { y: `+=${Math.PI * 2}`, ease: "none", duration: 0.55 },
       0,
@@ -361,25 +338,9 @@ function Model({
       );
     }
 
-    return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
-    };
-  }, [
-    tiltDeg,
-    tiltAxis,
-    pinDuration,
-    mobileBreakpoint,
-    startScale,
-    endScale,
-    cornerOffsetX,
-    cornerOffsetY,
-    backgroundTintColor,
-    sectionRef,
-    wordContainerRef,
-    footerRef,
-    scene,
-  ]);
+    return tl;
+    },
+  );
 
   return (
     <group ref={groupRef}>
