@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { usePinnedScroll } from "@/lib/usePinnedScroll";
 
 export type ProductRevealMode = "css3d" | "sequence";
 
@@ -71,65 +69,31 @@ export function ProductReveal({
   const sectionRef = useRef<HTMLElement | null>(null);
   const objectRef = useRef<HTMLImageElement | null>(null);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const object = objectRef.current;
-    if (!section || !object) return;
+  usePinnedScroll(
+    { triggerRef: sectionRef, pinDuration, mobileBreakpoint },
+    (ctx) => {
+      const object = objectRef.current;
+      // Same as before the migration: no explicit gsap.set for the
+      // reduced-motion case, just no tween — the element stays at its
+      // untouched DOM default (no rotation applied).
+      if (!object || ctx.prefersReducedMotion) return null;
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReducedMotion) return;
+      const [fromDeg, toDeg] = ctx.isMobile
+        ? [rotationRange[0] / 2, rotationRange[1] / 2]
+        : rotationRange;
 
-    const isMobile = window.innerWidth < mobileBreakpoint;
-    const [fromDeg, toDeg] = isMobile
-      ? [rotationRange[0] / 2, rotationRange[1] / 2]
-      : rotationRange;
-
-    // CONFIRMED FIX (not a hypothesis) — mobile has no pin (`pin:
-    // !isMobile` below), so the section scrolls past the viewport at
-    // native speed instead of being held on screen. A `pinDuration` sized
-    // for a *held* rotation risks the rotation still being mid-way when
-    // the (unpinned, moving) section has already scrolled out of view.
-    // Halving it alongside rotationRange keeps the same angular velocity
-    // (degrees per px) on both — same "speed", less total rotation, and
-    // the shorter distance completes comfortably inside the section's own
-    // natural scroll-through window. Only applies when pinDuration is a
-    // plain number (the default): a custom string like "+=800" is a
-    // relative ScrollTrigger expression we can't safely halve without
-    // parsing it, so a caller passing a string opts out of this
-    // adjustment and gets the same value on mobile and desktop.
-    const resolvedPinDuration =
-      isMobile && typeof pinDuration === "number"
-        ? pinDuration / 2
-        : pinDuration;
-    const resolvedEnd =
-      typeof resolvedPinDuration === "number"
-        ? `+=${resolvedPinDuration}`
-        : resolvedPinDuration;
-
-    const tween = gsap.fromTo(
-      object,
-      { rotateY: fromDeg },
-      {
-        rotateY: toDeg,
-        ease: "none",
-        transformPerspective: 1200,
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: resolvedEnd,
-          scrub: 0.5,
-          pin: !isMobile,
+      return gsap.fromTo(
+        object,
+        { rotateY: fromDeg },
+        {
+          rotateY: toDeg,
+          ease: "none",
+          transformPerspective: 1200,
+          scrollTrigger: ctx.scrollTrigger,
         },
-      },
-    );
-
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
-  }, [rotationRange, pinDuration, mobileBreakpoint]);
+      );
+    },
+  );
 
   return (
     <section

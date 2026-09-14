@@ -2,9 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { usePinnedScroll } from "@/lib/usePinnedScroll";
 
 export interface ImageSequenceProps {
   basePath: string;
@@ -102,64 +100,35 @@ export function ImageSequence({
     if (loadedCount > 0) drawFrame(canvasRef.current, imagesRef.current[0]);
   }, [loadedCount]);
 
-  useEffect(() => {
-    if (loadedCount < frameCount) return;
-    const section = sectionRef.current;
-    if (!section) return;
+  usePinnedScroll(
+    {
+      triggerRef: sectionRef,
+      pinDuration,
+      mobileBreakpoint,
+      // Same real gate as before the migration: don't set up the
+      // ScrollTrigger until every frame has preloaded.
+      enabled: loadedCount >= frameCount && frameCount > 0,
+    },
+    (ctx) => {
+      if (ctx.prefersReducedMotion) {
+        const index = Math.min(Math.max(staticFrameIndex, 0), frameCount - 1);
+        drawFrame(canvasRef.current, imagesRef.current[index]);
+        return null;
+      }
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (prefersReducedMotion) {
-      const index = Math.min(Math.max(staticFrameIndex, 0), frameCount - 1);
-      drawFrame(canvasRef.current, imagesRef.current[index]);
-      return;
-    }
-
-    const isMobile = window.innerWidth < mobileBreakpoint;
-    const resolvedPinDuration =
-      isMobile && typeof pinDuration === "number"
-        ? pinDuration / 2
-        : pinDuration;
-    const resolvedEnd =
-      typeof resolvedPinDuration === "number"
-        ? `+=${resolvedPinDuration}`
-        : resolvedPinDuration;
-
-    const state = { frame: 0 };
-    const tween = gsap.to(state, {
-      frame: frameCount - 1,
-      ease: "none",
-      onUpdate: () =>
-        drawFrame(
-          canvasRef.current,
-          imagesRef.current[Math.round(state.frame)],
-        ),
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: resolvedEnd,
-        // Same reasoning as ProductReveal: this pins the section (on
-        // desktop), and scrub: 0.5 is what avoided the pin-engage render
-        // jump there. Unlike CinematicScene (no pin — scrub: 0.5 was a
-        // mistake copied from here without the pin that justified it),
-        // this component does pin, so the same fix applies for real.
-        scrub: 0.5,
-        pin: !isMobile,
-      },
-    });
-
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
-  }, [
-    loadedCount,
-    frameCount,
-    pinDuration,
-    mobileBreakpoint,
-    staticFrameIndex,
-  ]);
+      const state = { frame: 0 };
+      return gsap.to(state, {
+        frame: frameCount - 1,
+        ease: "none",
+        onUpdate: () =>
+          drawFrame(
+            canvasRef.current,
+            imagesRef.current[Math.round(state.frame)],
+          ),
+        scrollTrigger: ctx.scrollTrigger,
+      });
+    },
+  );
 
   return (
     <section
