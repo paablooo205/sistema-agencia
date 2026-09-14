@@ -39,7 +39,7 @@ export function CinematicScene({
     if (!scene || !content || enter === "none") return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
@@ -67,7 +67,7 @@ export function CinematicScene({
           end: "top 50%",
           scrub: true,
         },
-      }
+      },
     );
 
     return () => {
@@ -90,6 +90,6 @@ export function CinematicScene({
         .join(" "),
       style: { minHeight },
     },
-    createElement("div", { ref: contentRef }, children)
+    createElement("div", { ref: contentRef }, children),
   );
 }

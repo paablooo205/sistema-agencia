@@ -25,7 +25,7 @@ export function BrandReveal({ text, as = "h1", className }: BrandRevealProps) {
     if (!el) return;
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) return;
 
