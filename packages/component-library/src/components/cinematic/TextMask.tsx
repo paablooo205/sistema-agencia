@@ -116,7 +116,10 @@ export function TextMask({
   return (
     <section
       ref={sectionRef}
-      className={["relative flex min-h-screen items-center justify-center", className]
+      className={[
+        "relative flex min-h-screen items-center justify-center",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

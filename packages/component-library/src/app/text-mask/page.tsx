@@ -20,8 +20,8 @@ export default function TextMaskDemoPage() {
       <section className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="text-2xl font-semibold">TextMask</h1>
         <p className="max-w-md text-lg">
-          Scroll para revelar cada titular ↓ — borde suave con degradado, no
-          un corte duro como ClipPathReveal.
+          Scroll para revelar cada titular ↓ — borde suave con degradado, no un
+          corte duro como ClipPathReveal.
         </p>
       </section>
       {DIRECTIONS.map(({ direction, text }) => (
