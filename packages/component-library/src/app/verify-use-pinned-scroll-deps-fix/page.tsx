@@ -55,7 +55,8 @@ function PinnedBox({ targetRotation }: { targetRotation: number }) {
       className="flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-neutral-100"
     >
       <p className="text-sm" data-testid="run-count">
-        Builder ejecutado: <strong>{runCount}</strong> {runCount === 1 ? "vez" : "veces"}
+        Builder ejecutado: <strong>{runCount}</strong>{" "}
+        {runCount === 1 ? "vez" : "veces"}
         {" — "}targetRotation actual: <strong>{targetRotation}°</strong>
       </p>
       <div
@@ -78,9 +79,9 @@ export default function VerifyUsePinnedScrollDepsFixPage() {
           usePinnedScroll — verificación del fix de extraDeps
         </h1>
         <p className="max-w-md text-lg">
-          El cuadrado de abajo ya está montado. Cambia el ángulo objetivo
-          SIN recargar la página ni tocar pinDuration — si el contador
-          &quot;Builder ejecutado&quot; sube, el fix funciona.
+          El cuadrado de abajo ya está montado. Cambia el ángulo objetivo SIN
+          recargar la página ni tocar pinDuration — si el contador &quot;Builder
+          ejecutado&quot; sube, el fix funciona.
         </p>
         <div className="flex gap-3">
           <button

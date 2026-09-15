@@ -12,12 +12,34 @@ export const metadata: Metadata = {
 // ParallaxImage). Sustituir por fotografía real de cliente antes de
 // reutilizar este patrón en producción.
 const IMAGES = [
-  { src: "/gallery-placeholder-1.svg", alt: "Placeholder de galería 1 (color terracota)", caption: "Placeholder 1 — sustituir por foto real" },
-  { src: "/gallery-placeholder-2.svg", alt: "Placeholder de galería 2 (color oliva)", caption: "Placeholder 2 — sustituir por foto real" },
-  { src: "/gallery-placeholder-3.svg", alt: "Placeholder de galería 3 (color azul oscuro)" },
-  { src: "/gallery-placeholder-4.svg", alt: "Placeholder de galería 4 (color mostaza)", caption: "Placeholder 4 — sustituir por foto real" },
-  { src: "/gallery-placeholder-5.svg", alt: "Placeholder de galería 5 (color verde azulado)" },
-  { src: "/gallery-placeholder-6.svg", alt: "Placeholder de galería 6 (color ciruela)", caption: "Placeholder 6 — sustituir por foto real" },
+  {
+    src: "/gallery-placeholder-1.svg",
+    alt: "Placeholder de galería 1 (color terracota)",
+    caption: "Placeholder 1 — sustituir por foto real",
+  },
+  {
+    src: "/gallery-placeholder-2.svg",
+    alt: "Placeholder de galería 2 (color oliva)",
+    caption: "Placeholder 2 — sustituir por foto real",
+  },
+  {
+    src: "/gallery-placeholder-3.svg",
+    alt: "Placeholder de galería 3 (color azul oscuro)",
+  },
+  {
+    src: "/gallery-placeholder-4.svg",
+    alt: "Placeholder de galería 4 (color mostaza)",
+    caption: "Placeholder 4 — sustituir por foto real",
+  },
+  {
+    src: "/gallery-placeholder-5.svg",
+    alt: "Placeholder de galería 5 (color verde azulado)",
+  },
+  {
+    src: "/gallery-placeholder-6.svg",
+    alt: "Placeholder de galería 6 (color ciruela)",
+    caption: "Placeholder 6 — sustituir por foto real",
+  },
 ];
 
 export default function HorizontalGalleryDemoPage() {
