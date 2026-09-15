@@ -10,10 +10,26 @@ export const metadata: Metadata = {
 // Reutiliza los placeholders de color de HorizontalGallery — sin generar
 // assets nuevos.
 const DIRECTIONS = [
-  { direction: "left" as const, src: "/gallery-placeholder-1.svg", label: "left" },
-  { direction: "right" as const, src: "/gallery-placeholder-2.svg", label: "right" },
-  { direction: "top" as const, src: "/gallery-placeholder-3.svg", label: "top" },
-  { direction: "bottom" as const, src: "/gallery-placeholder-4.svg", label: "bottom" },
+  {
+    direction: "left" as const,
+    src: "/gallery-placeholder-1.svg",
+    label: "left",
+  },
+  {
+    direction: "right" as const,
+    src: "/gallery-placeholder-2.svg",
+    label: "right",
+  },
+  {
+    direction: "top" as const,
+    src: "/gallery-placeholder-3.svg",
+    label: "top",
+  },
+  {
+    direction: "bottom" as const,
+    src: "/gallery-placeholder-4.svg",
+    label: "bottom",
+  },
 ];
 
 export default function ClipPathRevealDemoPage() {
@@ -22,8 +38,8 @@ export default function ClipPathRevealDemoPage() {
       <section className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="text-2xl font-semibold">ClipPathReveal</h1>
         <p className="max-w-md text-lg">
-          Scroll para revelar cada sección ↓ — cuatro direcciones distintas,
-          una por sección, para comparar.
+          Scroll para revelar cada sección ↓ — cuatro direcciones distintas, una
+          por sección, para comparar.
         </p>
       </section>
       {DIRECTIONS.map(({ direction, src, label }) => (
