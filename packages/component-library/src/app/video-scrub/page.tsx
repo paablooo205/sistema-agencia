@@ -21,9 +21,9 @@ export default function VideoScrubDemoPage() {
       <section className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="text-2xl font-semibold">VideoScrub</h1>
         <p className="max-w-md text-lg">
-          Scroll para controlar el vídeo directamente por posición de scroll
-          ↓ — en móvil y con &quot;prefers-reduced-motion: reduce&quot;
-          verás un fotograma fijo, no el scrub.
+          Scroll para controlar el vídeo directamente por posición de scroll ↓ —
+          en móvil y con &quot;prefers-reduced-motion: reduce&quot; verás un
+          fotograma fijo, no el scrub.
         </p>
       </section>
       <VideoScrub

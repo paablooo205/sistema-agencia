@@ -76,7 +76,9 @@ export function VideoScrub({
 }: VideoScrubProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const seekControllerRef = useRef<ReturnType<typeof createSeekController> | null>(null);
+  const seekControllerRef = useRef<ReturnType<
+    typeof createSeekController
+  > | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   // Seek controller's lifecycle is the video element's, not the scrub
