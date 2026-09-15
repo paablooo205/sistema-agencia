@@ -73,7 +73,10 @@ export function HorizontalGallery({
   );
 
   return (
-    <section ref={sectionRef} className={["overflow-hidden", className].filter(Boolean).join(" ")}>
+    <section
+      ref={sectionRef}
+      className={["overflow-hidden", className].filter(Boolean).join(" ")}
+    >
       <div
         ref={rowRef}
         data-testid="horizontal-gallery-row"
