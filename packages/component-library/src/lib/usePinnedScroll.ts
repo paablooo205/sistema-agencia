@@ -100,5 +100,21 @@ export function usePinnedScroll(
       handle?.scrollTrigger?.kill();
       handle?.kill();
     };
+    // KNOWN RISK, not yet hit in practice (2026-09-15): this effect only
+    // re-runs when triggerRef/pinDuration/mobileBreakpoint/enabled change
+    // — NOT when some other prop the builder closes over changes (e.g. a
+    // caller's rotationRange, startScale, tiltDeg...). If a mounted
+    // instance is re-rendered with a different value for one of those and
+    // pinDuration/mobileBreakpoint don't also change, the running
+    // tween/timeline keeps the stale value until this effect happens to
+    // re-run for an unrelated reason. Every current caller
+    // (ProductReveal, Product3DCloseout, ImageSequence) only ever receives
+    // static literal props, so this has never been observed — but it's a
+    // real gap, not a hypothetical one, if a caller ever passes a value
+    // that changes across re-renders of an already-mounted instance.
+    // Fixing it properly means either accepting a caller-supplied deps
+    // array (more API surface) or re-deriving scrollTrigger/build on every
+    // render (defeats the point of an effect) — deferred until a real
+    // caller actually needs it, not fixed preemptively.
   }, [triggerRef, pinDuration, mobileBreakpoint, enabled]);
 }
