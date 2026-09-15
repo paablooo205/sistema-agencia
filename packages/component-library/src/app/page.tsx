@@ -9,6 +9,7 @@ const DEMOS = [
   { href: "/brand-reveal", label: "BrandReveal demo" },
   { href: "/image-sequence", label: "ImageSequence demo" },
   { href: "/footer", label: "Footer demo" },
+  { href: "/horizontal-gallery", label: "HorizontalGallery demo" },
 ];
 
 export default function Home() {

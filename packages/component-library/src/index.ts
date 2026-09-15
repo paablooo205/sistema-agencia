@@ -47,6 +47,12 @@ export type {
   FooterEnter,
 } from "./components/cinematic/Footer";
 
+export { HorizontalGallery } from "./components/cinematic/HorizontalGallery";
+export type {
+  HorizontalGalleryProps,
+  HorizontalGalleryImage,
+} from "./components/cinematic/HorizontalGallery";
+
 export { usePinnedScroll } from "./lib/usePinnedScroll";
 export type {
   UsePinnedScrollOptions,
