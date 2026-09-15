@@ -76,6 +76,7 @@ export function HorizontalGallery({
     <section ref={sectionRef} className={["overflow-hidden", className].filter(Boolean).join(" ")}>
       <div
         ref={rowRef}
+        data-testid="horizontal-gallery-row"
         className="flex h-screen w-full snap-x snap-mandatory overflow-x-auto md:snap-none md:overflow-hidden md:motion-reduce:grid md:motion-reduce:h-auto md:motion-reduce:grid-cols-3 md:motion-reduce:gap-4 md:motion-reduce:overflow-visible md:motion-reduce:p-6"
         style={{ willChange: "transform" }}
       >
