@@ -70,7 +70,16 @@ export function ProductReveal({
   const objectRef = useRef<HTMLImageElement | null>(null);
 
   usePinnedScroll(
-    { triggerRef: sectionRef, pinDuration, mobileBreakpoint },
+    {
+      triggerRef: sectionRef,
+      pinDuration,
+      mobileBreakpoint,
+      // rotationRange isn't pinDuration/mobileBreakpoint, so without this
+      // the hook's effect wouldn't re-run when it changes on an
+      // already-mounted instance (2026-09-15 fix — see
+      // docs/superpowers/decisions/2026-09-15-use-pinned-scroll-deps-array-bug.md).
+      extraDeps: [rotationRange],
+    },
     (ctx) => {
       const object = objectRef.current;
       // Same as before the migration: no explicit gsap.set for the

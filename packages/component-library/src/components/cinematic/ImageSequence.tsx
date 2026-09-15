@@ -108,6 +108,11 @@ export function ImageSequence({
       // Same real gate as before the migration: don't set up the
       // ScrollTrigger until every frame has preloaded.
       enabled: loadedCount >= frameCount && frameCount > 0,
+      // frameCount/staticFrameIndex aren't pinDuration/mobileBreakpoint —
+      // without this the hook wouldn't re-run when they change on an
+      // already-mounted instance (2026-09-15 fix — see
+      // docs/superpowers/decisions/2026-09-15-use-pinned-scroll-deps-array-bug.md).
+      extraDeps: [frameCount, staticFrameIndex],
     },
     (ctx) => {
       if (ctx.prefersReducedMotion) {
