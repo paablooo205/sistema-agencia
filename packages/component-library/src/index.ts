@@ -62,6 +62,12 @@ export type {
   ClipPathRevealDirection,
 } from "./components/cinematic/ClipPathReveal";
 
+export { TextMask } from "./components/cinematic/TextMask";
+export type {
+  TextMaskProps,
+  TextMaskDirection,
+} from "./components/cinematic/TextMask";
+
 export { usePinnedScroll } from "./lib/usePinnedScroll";
 export type {
   UsePinnedScrollOptions,
