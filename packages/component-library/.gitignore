@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# VideoScrub demo asset — 40MB/4K, no ffmpeg available to compress it,
+# no Git LFS configured for this repo. Local-only for now; anyone else
+# running this demo needs to drop their own short video at this path.
+# See packages/component-library/README.md's HorizontalGallery-style
+# note in the VideoScrub row for the full context.
+/public/17186323-uhd_3840_2160_30fps.mp4

@@ -53,6 +53,9 @@ export type {
   HorizontalGalleryImage,
 } from "./components/cinematic/HorizontalGallery";
 
+export { VideoScrub } from "./components/cinematic/VideoScrub";
+export type { VideoScrubProps } from "./components/cinematic/VideoScrub";
+
 export { usePinnedScroll } from "./lib/usePinnedScroll";
 export type {
   UsePinnedScrollOptions,
