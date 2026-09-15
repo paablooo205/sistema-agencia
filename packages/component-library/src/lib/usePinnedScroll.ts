@@ -20,6 +20,22 @@ export interface UsePinnedScrollOptions {
   // (don't create the ScrollTrigger until every frame has preloaded).
   // Defaults to true so callers with no such gate don't need to pass it.
   enabled?: boolean;
+  // FIX (2026-09-15, was a documented-but-unfixed bug): this hook's own
+  // effect only reacts to triggerRef/pinDuration/mobileBreakpoint/enabled
+  // — it has no way to know which *other* props a caller's `builder`
+  // closure reads (rotationRange, startScale, tiltDeg...). Without this,
+  // if an already-mounted instance re-renders with a new value for one of
+  // those and pinDuration/mobileBreakpoint don't also change, the running
+  // tween/timeline silently keeps the stale value. `extraDeps` is passed
+  // straight into this hook's internal useEffect dependency array — same
+  // contract as useEffect/useMemo/useCallback's own deps array (stable
+  // length across renders, compared by Object.is per entry). A caller
+  // whose builder only reads pinDuration/mobileBreakpoint/enabled can
+  // omit it; one that reads anything else the animation should react to
+  // must list it here. See docs/superpowers/decisions/2026-09-15-use-pinned-scroll-deps-array-bug.md
+  // for the full incident writeup (found in review, not caught before the
+  // ProductReveal/Product3DCloseout/ImageSequence migration merged).
+  extraDeps?: unknown[];
 }
 
 export type PinnedScrollHandle = gsap.core.Tween | gsap.core.Timeline | null;
@@ -55,6 +71,7 @@ export function usePinnedScroll(
     pinDuration,
     mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
     enabled = true,
+    extraDeps = [],
   } = options;
 
   // Always-latest ref instead of putting `builder` in the effect's
@@ -100,21 +117,9 @@ export function usePinnedScroll(
       handle?.scrollTrigger?.kill();
       handle?.kill();
     };
-    // KNOWN RISK, not yet hit in practice (2026-09-15): this effect only
-    // re-runs when triggerRef/pinDuration/mobileBreakpoint/enabled change
-    // — NOT when some other prop the builder closes over changes (e.g. a
-    // caller's rotationRange, startScale, tiltDeg...). If a mounted
-    // instance is re-rendered with a different value for one of those and
-    // pinDuration/mobileBreakpoint don't also change, the running
-    // tween/timeline keeps the stale value until this effect happens to
-    // re-run for an unrelated reason. Every current caller
-    // (ProductReveal, Product3DCloseout, ImageSequence) only ever receives
-    // static literal props, so this has never been observed — but it's a
-    // real gap, not a hypothetical one, if a caller ever passes a value
-    // that changes across re-renders of an already-mounted instance.
-    // Fixing it properly means either accepting a caller-supplied deps
-    // array (more API surface) or re-deriving scrollTrigger/build on every
-    // render (defeats the point of an effect) — deferred until a real
-    // caller actually needs it, not fixed preemptively.
-  }, [triggerRef, pinDuration, mobileBreakpoint, enabled]);
+    // extraDeps spread last, same as any custom hook wrapping useEffect
+    // that accepts a caller-supplied deps array — see the `extraDeps`
+    // doc comment on UsePinnedScrollOptions for why this exists.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerRef, pinDuration, mobileBreakpoint, enabled, ...extraDeps]);
 }

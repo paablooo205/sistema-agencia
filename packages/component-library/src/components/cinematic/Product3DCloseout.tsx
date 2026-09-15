@@ -158,7 +158,30 @@ function Model({
   }, [scene, materialOverride, color]);
 
   usePinnedScroll(
-    { triggerRef: sectionRef, pinDuration, mobileBreakpoint },
+    {
+      triggerRef: sectionRef,
+      pinDuration,
+      mobileBreakpoint,
+      // None of these are pinDuration/mobileBreakpoint, so without this
+      // the hook wouldn't re-run the timeline when they change on an
+      // already-mounted instance (2026-09-15 fix — see
+      // docs/superpowers/decisions/2026-09-15-use-pinned-scroll-deps-array-bug.md).
+      // wordContainerRef/footerRef are ref objects (stable identity from
+      // useRef, never actually change) — included for parity with the
+      // pre-migration effect's own deps array, which listed them too.
+      extraDeps: [
+        tiltDeg,
+        tiltAxis,
+        startScale,
+        endScale,
+        cornerOffsetX,
+        cornerOffsetY,
+        backgroundTintColor,
+        wordContainerRef,
+        footerRef,
+        scene,
+      ],
+    },
     (ctx) => {
       const group = groupRef.current;
       const section = sectionRef.current;
