@@ -56,6 +56,12 @@ export type {
 export { VideoScrub } from "./components/cinematic/VideoScrub";
 export type { VideoScrubProps } from "./components/cinematic/VideoScrub";
 
+export { ClipPathReveal } from "./components/cinematic/ClipPathReveal";
+export type {
+  ClipPathRevealProps,
+  ClipPathRevealDirection,
+} from "./components/cinematic/ClipPathReveal";
+
 export { usePinnedScroll } from "./lib/usePinnedScroll";
 export type {
   UsePinnedScrollOptions,

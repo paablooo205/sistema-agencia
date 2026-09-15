@@ -11,6 +11,7 @@ const DEMOS = [
   { href: "/footer", label: "Footer demo" },
   { href: "/horizontal-gallery", label: "HorizontalGallery demo" },
   { href: "/video-scrub", label: "VideoScrub demo" },
+  { href: "/clip-path-reveal", label: "ClipPathReveal demo" },
 ];
 
 export default function Home() {
